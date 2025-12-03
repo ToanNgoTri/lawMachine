@@ -16,7 +16,7 @@ import {
   ActivityIndicator,
   Pressable,
   Vibration,
-  Button,
+  Butt2n,
 } from 'react-native';
 import { Dirs, FileSystem } from 'react-native-file-access';
 import React, { useState, useEffect, useRef } from 'react';
@@ -441,32 +441,15 @@ export function Detail5() {
             }
 
             return prev.concat(
-              // <View
-              //   // key={`${i0000)}htth`}
-              //   >
               <React.Fragment key={`${i}htth`}>
                 <View
                   style={{
-                    // backgroundColor: 'blue',
-                    // flex: 1,
-                    // alignSelf: 'center',
-                    // padding: 0,
-                    // margin: 0,
-                    // overflow: 'visible',
-                    // right: -50,
                     height: go ? 9 : 1,
                   }}
                 >
                   <View
                     key={`${i}img`}
                     style={{
-                      // backgroundColor: 'blue',
-                      // flex: 1,
-                      // alignSelf: 'center',
-                      // padding: 0,
-                      // margin: 0,
-                      // overflow: 'visible',
-                      // right: -50,
                       height: go ? 9 : 1,
                     }}
                     onLayout={event => {
@@ -496,7 +479,6 @@ export function Detail5() {
                           ...(article ? { ...styles.dieu } : {}),
                           ...styles.highlight,
                         }
-                    // {width:'auto',backgroundColor:'yellow'}
                   }
                   key={`${i}gmi`}
                 >
@@ -522,13 +504,11 @@ export function Detail5() {
             <Text style={{ textAlign: 'justify' }}>{searchedPara}</Text>
           </View>
         );
-        // return <View >{searchedPara}</View>;
-        // return <Text >{searchedPara}</Text>;
       } else {
-        return text;
+        return <Text>{text}</Text>;
       }
     } else {
-      return text;
+      return <Text>{text}</Text>;
     }
   }
 
@@ -613,13 +593,6 @@ export function Detail5() {
     return Object.keys(item)[0].match(new RegExp(abc, 'igm'));
   });
 
-  // const fade = useRef(new Animated.Value(1)).current;
-
-  // let fadeAnimation = fade.interpolate({
-  //   inputRange: [0, 1],
-  //   outputRange: ['transparent', '#d1daa8ff'],
-  // });
-
   let transY = animatedForNavi.interpolate({
     inputRange: [-100, 0, 80, 90, 100],
     outputRange: [0, 0, -50 - insets.bottom / 2, 0, 0],
@@ -666,7 +639,6 @@ export function Detail5() {
   };
 
   const a = (key, i, key1, i1a, t) => {
-    // phần nếu có mục 'chương' trong văn bản
     console.log('a');
     onlyArticle = false;
     return Object.keys(key)[0] != '0' ? (
@@ -692,7 +664,7 @@ export function Detail5() {
                 console.log('Copied:', fullText);
                 setCopied(title);
                 showToast();
-                Vibration.vibrate(50);
+                Vibration.vibrate(20);
               }}
             >
               <Animated.View
@@ -844,7 +816,7 @@ export function Detail5() {
           console.log('Copied:', fullText);
           setCopied(title);
           showToast();
-          Vibration.vibrate(50);
+          Vibration.vibrate(20);
         }}
       >
         <View key={`${i}c`}>
@@ -894,7 +866,7 @@ export function Detail5() {
           console.log('Copied:', fullText);
           setCopied(title);
           showToast();
-          Vibration.vibrate(50);
+          Vibration.vibrate(20);
         }}
       >
         <Animated.View
