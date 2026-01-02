@@ -670,7 +670,7 @@ export default function Home({}) {
                   let timeOut = setTimeout(() => {
                     setShowPolicy(false);
                     return () => {};
-                  }, 300);
+                  }, 150);
 
                   const currentVersion = VersionCheck.getCurrentVersion();
 
@@ -683,7 +683,7 @@ export default function Home({}) {
                   Animated.timing(animated, {
                     toValue: showPolicy || updateStatus ? 100 : 0,
                     // toValue:100,
-                    duration: 300,
+                    duration: 150,
                     useNativeDriver: false,
                   }).start();
                 }}
@@ -713,13 +713,13 @@ export default function Home({}) {
                       setShowPolicy(false);
                       SetUpdateStatus(false);
                       return () => {};
-                    }, 300);
+                    }, 150);
                     exitUpdate();
 
                     Animated.timing(animated, {
                       toValue: showPolicy || updateStatus ? 100 : 0,
                       // toValue:100,
-                      duration: 300,
+                      duration: 150,
                       useNativeDriver: false,
                     }).start();
 
@@ -759,12 +759,12 @@ export default function Home({}) {
                       setShowPolicy(false);
                       SetUpdateStatus(false);
                       return () => {};
-                    }, 300);
+                    }, 150);
 
                     acceptUpdate();
                     Animated.timing(animated, {
                       toValue: showPolicy || updateStatus ? 100 : 0,
-                      duration: 300,
+                      duration: 150,
                       useNativeDriver: false,
                     }).start();
                   }}
