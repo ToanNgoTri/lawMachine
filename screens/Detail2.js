@@ -228,6 +228,7 @@ export function Detail2({}) {
         lawNameDisplay: law.info['lawNameDisplay'],
         lawDescription: law.info['lawDescription'],
         lawDaySign: law.info['lawDaySign'],
+        lawDayActive: law.info['lawDayActive'],
       };
     });
     return lawObject;
@@ -339,7 +340,6 @@ export function Detail2({}) {
   }, []);
 
   const renderDots = '.'.repeat(dotCount);
-
 
   async function getContentExist() {
     if (await FileSystem.exists(Dirs.CacheDir + '/lastedLaw.txt', 'utf8')) {
@@ -463,6 +463,27 @@ export function Detail2({}) {
     let detailId = title.item;
     let i = title.index;
 
+    const dateLawDaySign = new Date(SearchResult[detailId]['lawDaySign']);
+
+    const formattedDateLawDaySign = dateLawDaySign.toLocaleDateString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    });
+
+    const dateLawDayActive = new Date(SearchResult[detailId]['lawDayActive']);
+
+    const formattedDateLawDayActive = dateLawDayActive.toLocaleDateString(
+      'vi-VN',
+      {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      },
+    );
+
+    // console.log(typeof formattedDateLawDayActive );
+
     return (
       <TouchableOpacity
         key={i}
@@ -499,6 +520,41 @@ export function Detail2({}) {
               `${i}ab`,
             )}
           </Text>
+        </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}
+        >
+          {formattedDateLawDaySign !== 'Invalid Date' && (
+            <Text
+              style={{
+                textAlign: 'left',
+                paddingLeft: 20,
+                fontStyle: 'italic',
+                color: 'gray',
+                fontSize: 12,
+              }}
+            >
+              Ngày ký: {formattedDateLawDaySign}
+            </Text>
+          )}
+          {formattedDateLawDayActive !== 'Invalid Date' && (
+            <Text
+              style={{
+                textAlign: 'right',
+                right: 0,
+                paddingRight: 20,
+                fontStyle: 'italic',
+                color: 'gray',
+                fontSize: 12,
+                position: 'absolute',
+              }}
+            >
+              Ngày hiệu lực: {formattedDateLawDayActive}
+            </Text>
+          )}
         </View>
       </TouchableOpacity>
     );
@@ -552,7 +608,7 @@ export function Detail2({}) {
       <View
         style={{
           backgroundColor: 'green',
-          paddingTop: insets.top+5,
+          paddingTop: insets.top + 5,
           borderBottomWidth: 1,
           borderBottomColor: 'black',
         }}
@@ -564,7 +620,7 @@ export function Detail2({}) {
         >
           <Text style={styles.titleText}>{`Tìm kiếm văn bản`}</Text>
         </TouchableWithoutFeedback> */}
-        <View style={{ ...styles.inputContainer, height: 52 ,top:5}}>
+        <View style={{ ...styles.inputContainer, height: 52, top: 5 }}>
           <View style={{ ...styles.containerBtb, paddingTop: 5 }}>
             <TouchableOpacity
               style={{
@@ -653,7 +709,7 @@ export function Detail2({}) {
                 }}
                 onFocus={() => setTextInputFocus(true)}
                 onBlur={() => setTextInputFocus(false)}
-                  ></TextInput>
+              ></TextInput>
               <TouchableOpacity
                 onPress={() => {
                   setInput('');
@@ -789,7 +845,7 @@ export function Detail2({}) {
       </View>
 
       <View style={{ marginTop: 0, flex: 1, backgroundColor: '#EEEFE4' }}>
-        {(loading5 ) && (
+        {loading5 && (
           <TouchableOpacity
             style={{
               position: 'absolute',
@@ -989,16 +1045,16 @@ export function Detail2({}) {
                 placeholderTextColor={'gray'}
                 onTouchEnd={() => {
                   if (textInputFilterFocus) {
-                  textInputFilter.current.blur();
-                  setTextInputFilterFocus(false);
-                } else {
-                  setTextInputFilterFocus(true);
-                  textInputFilter.current.focus();
-                }
-              }}
-              onFocus={() => setTextInputFilterFocus(true)}
-              onBlur={() => setTextInputFilterFocus(false)}
-                ></TextInput>
+                    textInputFilter.current.blur();
+                    setTextInputFilterFocus(false);
+                  } else {
+                    setTextInputFilterFocus(true);
+                    textInputFilter.current.focus();
+                  }
+                }}
+                onFocus={() => setTextInputFilterFocus(true)}
+                onBlur={() => setTextInputFilterFocus(false)}
+              ></TextInput>
               <TouchableOpacity
                 onPress={() => setInputFilter('')}
                 style={{
@@ -1143,7 +1199,6 @@ export function Detail2({}) {
                             alignItems: 'center',
                           }}
                           onPress={() => {
-                            
                             if (key == undefined) {
                             } else if (choosenLaw.includes(key)) {
                               setChoosenLaw(
@@ -1297,11 +1352,12 @@ const styles = StyleSheet.create({
   //   flexDirection: 'column',
   // },
   item: {
-    minHeight: 80,
+    // minHeight: 80,
     display: 'flex',
     justifyContent: 'center',
     paddingLeft: 20,
     paddingRight: 20,
+    // paddingBottom: 2,
     flexDirection: 'column',
     alignItems: 'center',
     // backgroundColor:'red'

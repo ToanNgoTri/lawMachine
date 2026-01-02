@@ -1902,27 +1902,30 @@ export function Detail5() {
                       style={{
                         ...styles.ModalInfoContainer,
                         borderBottomWidth: 2,
+                        flexDirection: 'column',
+                        //  width: '100%'
                       }}
                     >
-                      <View style={{ width: '40%' }}>
-                        <Text style={styles.ModalInfoTitle}>
+                      <View style={{ width: '100%' }}>
+                        <Text style={{...styles.ModalInfoTitle,textAlign:'center',paddingBottom:0}}>
                           Văn bản liên quan:
                         </Text>
                       </View>
                       <View
-                        style={{ flex: 1, paddingBottom: 10, paddingTop: 10 }}
+                        style={{ paddingBottom: 10, paddingTop: 10 ,flexDirection:'column',width:'100%',paddingRight:10,paddingLeft:10}}
                       >
                         {Info &&
                           Object.keys(Info['lawRelated']).map((key, i) => {
-                            let nameLaw = key;
                             if (Info['lawRelated'][key]) {
+                              let nameLaw = Info['lawRelated'][key];
                               return (
                                 <TouchableOpacity
+                                // style={{backgroundColor:'red'}}
                                   key={`${i}lawRelated`}
                                   onPress={() => {
                                     if (internetConnected) {
                                       navigation.push(`accessLaw`, {
-                                        screen: Info['lawRelated'][key],
+                                        screen: key,
                                       });
                                       setModalStatus(false);
                                     }
@@ -1932,8 +1935,12 @@ export function Detail5() {
                                     style={{
                                       ...styles.ModalInfoContentLawRelated,
                                       textAlign: 'justify',
-                                      fontWeight: 'bold',
+                                      fontWeight: 600,
                                       fontStyle: 'italic',
+                                      // backgroundColor:'blue',
+                                      lineHeight:22,
+                                      paddingLeft: 0,
+
                                     }}
                                   >
                                     -{' '}
@@ -2200,6 +2207,7 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     justifyContent: 'center',
     alignItems: 'center',
+    width: '95%',
     // paddingBottom:10
   },
   ModalInfoTitle: {
