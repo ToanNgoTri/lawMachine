@@ -16,7 +16,7 @@ import CheckBox from 'react-native-check-box';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNetInfo } from '@react-native-community/netinfo';
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef ,memo, useCallback} from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -61,6 +61,9 @@ export function Detail1({}) {
 
   const netInfo = useNetInfo();
   let internetConnected = netInfo.isConnected;
+
+  console.log(2);
+  
 
   useEffect(() => {
     setChoosenLaw(
@@ -255,10 +258,24 @@ export function Detail1({}) {
     );
   };
 
-  const Item = ({ title }) => {
-    let detailId = title.item;
-    let i = title.index;
+    const renderItem = useCallback(
+    ( data ) => (
+      <Item
+        id={data}
+        // title={SearchResult[data]}
+        // valueInput={valueInput}
+      />
+    ),
+    [SearchResult, input]
+  );
+  
 
+  const Item = memo((title) => {
+    console.log(title);
+    let detailId = title?.id?.item;
+    let i = title?.id?.index;
+
+      
     let nameLaw = 'unknown name';
     let descriptionLaw = 'unknown name';
     if (result) {
@@ -354,7 +371,7 @@ export function Detail1({}) {
         </View>
       </TouchableOpacity>
     );
-  };
+  })
 
 
   function convertResultLoading(obj) {
@@ -700,7 +717,7 @@ export function Detail1({}) {
               (global.SearchContentRef = ref), FlatListToScroll;
             }}
             data={Object.keys(convertResultLoading(LawFilted))}
-            renderItem={item => <Item title={item} />}
+            renderItem={renderItem}
             onEndReached={distanceFromEnd => {
               if (!distanceFromEnd.distanceFromEnd) {
                 loadMoreData();

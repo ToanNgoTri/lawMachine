@@ -16,7 +16,7 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
-import React, { useEffect, useState, useRef, useContext } from 'react';
+import React, { useEffect, useState, useRef, memo, useCallback } from 'react';
 import { useNetInfo } from '@react-native-community/netinfo';
 import CheckBox from 'react-native-check-box';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -72,8 +72,7 @@ export function Detail2({}) {
 
   const FlatListToScroll = useRef(null);
 
-  // RefOfSearchLaw.updatesearchLawRef(FlatListToScroll)
-  // useScrollToTop(FlatListToScroll);
+  console.log(1);
 
   const dispatch = useDispatch();
 
@@ -332,12 +331,15 @@ export function Detail2({}) {
   }, [result4]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setDotCount(prev => (prev < 3 ? prev + 1 : 1));
-    }, 500); // 500ms mỗi lần thay đổi
+   if (!loading3) return;
 
-    return () => clearInterval(interval);
-  }, []);
+  const interval = setInterval(() => {
+    setDotCount(prev => (prev < 3 ? prev + 1 : 1));
+  }, 500);
+
+  return () => clearInterval(interval);
+  }, [loading3]);
+  
 
   const renderDots = '.'.repeat(dotCount);
 
@@ -459,10 +461,23 @@ export function Detail2({}) {
     setChoosenKindLaw([0, 1, 2]);
   }
 
-  const Item = ({ title }) => {
-    let detailId = title.item;
-    let i = title.index;
+  const renderItem = useCallback(
+  ( data ) => (
+    <Item
+      id={data}
+      // title={SearchResult[data]}
+      valueInput={valueInput}
+    />
+  ),
+  [SearchResult, valueInput]
+);
 
+  const Item = memo(( title ) => {
+    let detailId = title.id.item;
+    let i = title.id.index;
+
+    console.log('detailId',detailId);
+    
     const dateLawDaySign = new Date(SearchResult[detailId]['lawDaySign']);
 
     const formattedDateLawDaySign = dateLawDaySign.toLocaleDateString('vi-VN', {
@@ -558,7 +573,7 @@ export function Detail2({}) {
         </View>
       </TouchableOpacity>
     );
-  };
+  });
 
   function loadMoreData() {
     if (paper < Math.ceil(Object.keys(SearchResult).length / 30)) {
@@ -932,7 +947,7 @@ export function Detail2({}) {
               (global.SearchLawRef = ref), FlatListToScroll;
             }}
             data={Object.keys(convertResultLoading(LawFilted))}
-            renderItem={item => <Item title={item} />}
+            renderItem={renderItem}
             onEndReached={distanceFromEnd => {
               if (!distanceFromEnd.distanceFromEnd) {
                 loadMoreData();

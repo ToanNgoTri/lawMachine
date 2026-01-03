@@ -873,8 +873,6 @@ export function Detail5() {
           style={{
             paddingVertical: 4,
             backgroundColor: copied == title ? '#d1daa8ff' : 'transparent',
-            // opacity: fadeAnimation,
-            // borderRadius: 4,
           }}
           onLayout={event => {
             event.target.measure((x, y, width, height, pageX, pageY) => {
@@ -886,10 +884,11 @@ export function Detail5() {
           }}
         >
           <Text style={styles.lines}>
-            {highlight([key[ObjKeys]], valueInput, false).replace(
+            {/* {typeof  highlight([key[ObjKeys]], valueInput, false) == 'string' ? highlight([key[ObjKeys]], valueInput, false).replace(
               /\n/gim,
               '\n    ',
-            )}
+            ): ' '} */}
+{highlight([fullText], valueInput, false)}
           </Text>
         </Animated.View>
       </Pressable>
@@ -989,7 +988,7 @@ export function Detail5() {
                 style={{
                   alignItems: 'center',
                   justifyContent: 'center',
-                  backgroundColor: 'red',
+                  backgroundColor: 'yellow',
                 }}
                 source={require('../assets/t.png')}
               ></Image>
@@ -1073,7 +1072,7 @@ export function Detail5() {
                               )
                             ? a(key, i, Object.keys(key)[0])
                             : !Object.keys(key)[0].match(
-                                /^(Câu |Điều )?\d+(\.\d+)*(\.|:)(.*)$/gim,
+                                /^(Câu |Điều )?\d+(\.\d+)*(\.|:|$)(.*)$/gim,
                               )
                             ? d(key, i, Object.keys(key)[0])
                             : c(key, i, Object.keys(key)[0])}
