@@ -16,7 +16,7 @@ import CheckBox from 'react-native-check-box';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNetInfo } from '@react-native-community/netinfo';
-import React, { useEffect, useState, useRef ,memo, useCallback} from 'react';
+import React, { useEffect, useState, useRef, memo, useCallback } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -63,7 +63,6 @@ export function Detail1({}) {
   let internetConnected = netInfo.isConnected;
 
   console.log(2);
-  
 
   useEffect(() => {
     setChoosenLaw(
@@ -258,24 +257,22 @@ export function Detail1({}) {
     );
   };
 
-    const renderItem = useCallback(
-    ( data ) => (
+  const renderItem = useCallback(
+    data => (
       <Item
         id={data}
         // title={SearchResult[data]}
         // valueInput={valueInput}
       />
     ),
-    [SearchResult, input]
+    [SearchResult, input],
   );
-  
 
-  const Item = memo((title) => {
+  const Item = memo(title => {
     console.log(title);
     let detailId = title?.id?.item;
     let i = title?.id?.index;
 
-      
     let nameLaw = 'unknown name';
     let descriptionLaw = 'unknown name';
     if (result) {
@@ -319,7 +316,10 @@ export function Detail1({}) {
           // marginBottom: 6,
         }}
         onPress={() => {
-          navigation.push(`accessLaw`, { screen: detailId, input: inputForNavi });
+          navigation.push(`accessLaw`, {
+            screen: detailId,
+            input: inputForNavi,
+          });
           // setName(i);
         }}
       >
@@ -371,8 +371,7 @@ export function Detail1({}) {
         </View>
       </TouchableOpacity>
     );
-  })
-
+  });
 
   function convertResultLoading(obj) {
     const first30Entries = Object.entries(obj).slice(0, paper * 30);
@@ -564,36 +563,34 @@ export function Detail1({}) {
                 )}
               </TouchableOpacity>
             </View>
-            <Text
-              style={{
-                color: '#FF4500',
-                fontSize: 12,
-                textAlign: 'center',
-                fontWeight: 'bold',
-                lineHeight: 14,
-              }}
-            >
-              {warning ? 'Vui lòng nhập từ khóa hợp lệ' : ' '}
-            </Text>
           </View>
           <View style={styles.containerBtb}>
             <TouchableOpacity
+            disabled={loading1}
               style={{
                 ...styles.inputBtb,
                 borderRadius: 100,
                 height: 40,
                 borderWidth: 2,
-                borderColor: 'green',
+                borderColor: "#f67c1a",
                 minWidth: 40,
+
               }}
               onPress={() => {
                 pressToSearch();
               }}
             >
-              <Ionicons
-                name="search-outline"
-                style={styles.inputBtbText}
-              ></Ionicons>
+              {loading1 ? (
+                <ActivityIndicator
+                  size="small"
+                  color="black"
+                ></ActivityIndicator>
+              ) : (
+                <Ionicons
+                  name="search-outline"
+                  style={styles.inputBtbText}
+                ></Ionicons>
+              )}
             </TouchableOpacity>
           </View>
         </View>
@@ -1123,14 +1120,14 @@ const styles = StyleSheet.create({
   inputBtb: {
     width: '80%',
     height: 30,
-    backgroundColor: 'black',
+    backgroundColor: '#f67c1a',
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
     // right: 5,
   },
   inputBtbText: {
-    color: '#f67c1a',
+    color: 'white',
     fontWeight: 'bold',
     fontSize: 20,
   },

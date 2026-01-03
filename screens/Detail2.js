@@ -331,15 +331,14 @@ export function Detail2({}) {
   }, [result4]);
 
   useEffect(() => {
-   if (!loading3) return;
+    if (!loading3) return;
 
-  const interval = setInterval(() => {
-    setDotCount(prev => (prev < 3 ? prev + 1 : 1));
-  }, 500);
+    const interval = setInterval(() => {
+      setDotCount(prev => (prev < 3 ? prev + 1 : 1));
+    }, 500);
 
-  return () => clearInterval(interval);
+    return () => clearInterval(interval);
   }, [loading3]);
-  
 
   const renderDots = '.'.repeat(dotCount);
 
@@ -462,22 +461,22 @@ export function Detail2({}) {
   }
 
   const renderItem = useCallback(
-  ( data ) => (
-    <Item
-      id={data}
-      // title={SearchResult[data]}
-      valueInput={valueInput}
-    />
-  ),
-  [SearchResult, valueInput]
-);
+    data => (
+      <Item
+        id={data}
+        // title={SearchResult[data]}
+        valueInput={valueInput}
+      />
+    ),
+    [SearchResult, valueInput],
+  );
 
-  const Item = memo(( title ) => {
+  const Item = memo(title => {
     let detailId = title.id.item;
     let i = title.id.index;
 
-    console.log('detailId',detailId);
-    
+    console.log('detailId', detailId);
+
     const dateLawDaySign = new Date(SearchResult[detailId]['lawDaySign']);
 
     const formattedDateLawDaySign = dateLawDaySign.toLocaleDateString('vi-VN', {
@@ -628,13 +627,6 @@ export function Detail2({}) {
           borderBottomColor: 'black',
         }}
       >
-        {/* <TouchableWithoutFeedback
-          onPress={() => {
-            Keyboard.dismiss();
-          }}
-        >
-          <Text style={styles.titleText}>{`Tìm kiếm văn bản`}</Text>
-        </TouchableWithoutFeedback> */}
         <View style={{ ...styles.inputContainer, height: 52, top: 5 }}>
           <View style={{ ...styles.containerBtb, paddingTop: 5 }}>
             <TouchableOpacity
@@ -752,7 +744,7 @@ export function Detail2({}) {
                 )}
               </TouchableOpacity>
             </View>
-            <Text
+            {/* <Text
               style={{
                 color: '#FF4500',
                 fontSize: 12,
@@ -762,26 +754,37 @@ export function Detail2({}) {
               }}
             >
               {warning ? 'Vui lòng nhập từ khóa hợp lệ' : ' '}
-            </Text>
+            </Text> */}
           </View>
           <View style={{ ...styles.containerBtb, paddingTop: -5 }}>
             <TouchableOpacity
+              disabled={loading5}
               style={{
+                
                 ...styles.inputBtb,
                 borderRadius: 100,
                 height: 40,
                 borderWidth: 2,
-                borderColor: '#f67c1a',
+                // borderColor: loading5 ? "black" : "#f67c1a",
                 minWidth: 40,
+                // backgroundColor: !input ? '#ddd' : 'black'
               }}
               onPress={() => {
                 pressToSearch();
               }}
             >
-              <Ionicons
-                name="search-outline"
-                style={styles.inputBtbText}
-              ></Ionicons>
+              {loading5 ? (
+                <ActivityIndicator
+                  size="small"
+                  color="#f67c1a"
+                  // style={{ backgroundColor: 'blue' }}
+                ></ActivityIndicator>
+              ) : (
+                <Ionicons
+                  name="search-outline"
+                  style={styles.inputBtbText}
+                ></Ionicons>
+              )}
             </TouchableOpacity>
           </View>
         </View>

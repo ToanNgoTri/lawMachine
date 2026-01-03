@@ -551,115 +551,125 @@ export default function Home({}) {
               elevation: 20,
             }}
           >
-            {!updateStatus ? ( // updateStatus
-              <ScrollView showsVerticalScrollIndicator={false}>
-                <View style={{ marginBottom: 20, marginTop: 30 }}>
-                  <Text
-                    style={{
-                      fontWeight: 'bold',
-                      fontSize: 30,
-                      textAlign: 'center',
-                    }}
-                  >
-                    Lời mở đầu{' '}
-                  </Text>
-                </View>
+{!updateStatus ? (
+  /* ================= POLICY ================= */
+  <ScrollView
+    showsVerticalScrollIndicator={false}
+    contentContainerStyle={{ paddingBottom: 20 }}
+  >
+    {/* Header */}
+    <View style={{ alignItems: 'center', marginTop: 24, marginBottom: 16 }}>
+      <Ionicons name="document-text-outline" size={48} color="green" />
+      <Text
+        style={{
+          fontSize: 26,
+          fontWeight: 'bold',
+          marginTop: 10,
+        }}
+      >
+        Lời mở đầu
+      </Text>
+    </View>
 
-                <View style={{}}>
-                  <Text
-                    style={{
-                      fontWeight: 600,
-                      paddingLeft: 20,
-                      paddingRight: 20,
-                      textAlign: 'justify',
-                      lineHeight: 23,
-                    }}
-                  >
-                    {'  '}Các thông tin, nội dung và dịch vụ mà Sổ Tay Luật
-                    cung cấp chỉ mang tính chất tham khảo, với mục đích đem lại
-                    cho người sử dụng những thông tin tổng quát về các quy định
-                    của pháp luật qua từng thời kỳ. Thêm vào đó, việc thay đổi,
-                    bổ sung các quy định luật pháp là điều không tránh khỏi ở
-                    mỗi giai đoạn phát triển, bởi vậy, mọi trường hợp người sử
-                    dụng muốn vận dụng các quy định pháp luật vào từng trường
-                    hợp cụ thể, nhất thiết phải tham khảo ý kiến của các cơ quan
-                    nhà nước có thẩm quyền hoặc của các chuyên gia tư vấn pháp
-                    lý về việc áp dụng các quy định này.
-                  </Text>
-                </View>
-                <View style={{}}>
-                  <Text
-                    style={{
-                      fontWeight: 600,
-                      paddingLeft: 20,
-                      paddingRight: 20,
-                      textAlign: 'justify',
-                      lineHeight: 23,
-                    }}
-                  >
-                    {'  '}Mặc dù đã cố gắng hạn chế những sai sót trong quá
-                    trình nhập liệu và đăng tải, các thông tin, nội dung văn bản
-                    pháp luật do Sổ Tay Luật cung cấp không tránh khỏi những
-                    khiếm khuyết hay sai sót do lỗi đánh máy, trình bày, hay
-                    tính đúng sai về hiệu lực pháp lý của văn bản. Việc người sử
-                    dụng chấp nhận sử dụng dịch vụ của Sổ Tay Luật ngay từ lần
-                    đầu tiên cũng đồng nghĩa với việc chấp nhận những khiếm
-                    khuyết này, cũng như không làm nảy sinh bất cứ trách nhiệm
-                    pháp lý nào của Sổ Tay Luật với người sử dụng khi xảy ra
-                    thiệt hại (nếu có) từ việc vận dụng các nội dung, thông tin
-                    mà Sổ Tay Luật cung cấp
-                  </Text>
-                </View>
-                <View style={{paddingBottom:10}}>
-                  <Text
-                    style={{
-                      fontWeight: 600,
-                      paddingLeft: 20,
-                      paddingRight: 20,
-                      textAlign: 'justify',
-                      lineHeight: 23,
-                    }}
-                  >
-                    {'   '}Đây là ứng dụng tra cứu Luật của tập thể Pixel Places
-                    Game xây dựng và phát triển. Ứng dụng không đại diện cho bất
-                    kỳ cơ quan nào thuộc Chính phủ. Cuối cùng, xin chân thành
-                    cảm ơn tất cả các bạn và người dùng ứng dụng đã tin tưởng và
-                    ủng hộ chúng tôi !
-                  </Text>
-                </View>
-              </ScrollView>
-            ) : (
-              <ScrollView showsVerticalScrollIndicator={false} >
-                <View style={{ marginBottom: 10, marginTop: 20 }}>
-                  <Text
-                    style={{
-                      fontWeight: 'bold',
-                      fontSize: 30,
-                      textAlign: 'center',
-                    }}
-                  >
-                    Thông báo{' '}
-                  </Text>
-                </View>
+    {/* Paragraph 1 */}
+    <Text
+      style={{
+        fontSize: 15,
+        lineHeight: 22,
+        color: '#333',
+        paddingHorizontal: 20,
+        textAlign: 'justify',
+        marginBottom: 12,
+      }}
+    >
+      Các thông tin, nội dung và dịch vụ mà <Text style={{ fontWeight: 'bold' }}>Sổ Tay Luật</Text> cung cấp
+      chỉ mang tính chất tham khảo, nhằm đem lại cho người sử dụng cái nhìn tổng quát
+      về các quy định pháp luật qua từng thời kỳ.
+    </Text>
 
-                <View style={{paddingBottom:10}}>
-                  <Text
-                    style={{
-                      fontWeight: 600,
-                      paddingLeft: 10,
-                      paddingRight: 10,
-                      textAlign: 'justify',
-                      // lineHeight:23,
-                      fontSize: 18,
-                      textAlign: 'center',
-                    }}
-                  >
-                    Sổ Tay Luật đã có phiên bản mới. Bạn có thể cập nhật để sử
-                    dụng những tiện ích mới.
-                  </Text>
-                </View>
-              </ScrollView>
-            )}
+    {/* Paragraph 2 */}
+    <Text
+      style={{
+        fontSize: 15,
+        lineHeight: 22,
+        color: '#333',
+        paddingHorizontal: 20,
+        textAlign: 'justify',
+        marginBottom: 12,
+      }}
+    >
+      Do các quy định pháp luật có thể thay đổi, bổ sung theo từng giai đoạn,
+      người sử dụng khi áp dụng vào các trường hợp cụ thể cần tham khảo ý kiến
+      của cơ quan nhà nước có thẩm quyền hoặc chuyên gia tư vấn pháp lý.
+    </Text>
+
+    {/* Paragraph 3 */}
+    <Text
+      style={{
+        fontSize: 15,
+        lineHeight: 22,
+        color: '#333',
+        paddingHorizontal: 20,
+        textAlign: 'justify',
+        marginBottom: 12,
+      }}
+    >
+      Mặc dù đã nỗ lực hạn chế sai sót, các nội dung pháp luật được cung cấp
+      vẫn có thể tồn tại lỗi đánh máy, trình bày hoặc sai lệch về hiệu lực pháp lý.
+      Việc sử dụng ứng dụng đồng nghĩa với việc chấp nhận các thiếu sót này và
+      Sổ Tay Luật không chịu trách nhiệm pháp lý đối với mọi thiệt hại phát sinh (nếu có).
+    </Text>
+
+    {/* Footer */}
+    <Text
+      style={{
+        fontSize: 15,
+        lineHeight: 22,
+        color: '#333',
+        paddingHorizontal: 20,
+        textAlign: 'justify',
+      }}
+    >
+      Ứng dụng được phát triển bởi tập thể <Text style={{ fontWeight: 'bold' }}>Pixel Places Game</Text>,
+      không đại diện cho bất kỳ cơ quan nhà nước nào. Xin chân thành cảm ơn
+      sự tin tưởng và ủng hộ của quý người dùng.
+    </Text>
+  </ScrollView>
+) : (
+  /* ================= UPDATE ================= */
+  <ScrollView
+    showsVerticalScrollIndicator={false}
+    contentContainerStyle={{ paddingBottom: 20 }}
+  >
+    {/* Header */}
+    <View style={{ alignItems: 'center', marginTop: 28, marginBottom: 16 }}>
+      <Ionicons name="cloud-download-outline" size={56} color="green" />
+      <Text
+        style={{
+          fontSize: 26,
+          fontWeight: 'bold',
+          marginTop: 12,
+        }}
+      >
+        Cập nhật mới
+      </Text>
+    </View>
+
+    {/* Content */}
+    <Text
+      style={{
+        fontSize: 16,
+        lineHeight: 22,
+        color: '#444',
+        textAlign: 'center',
+        paddingHorizontal: 24,
+      }}
+    >
+      Sổ Tay Luật đã có phiên bản mới với nhiều cải tiến và tính năng hữu ích.
+      Bạn nên cập nhật để có trải nghiệm tốt nhất.
+    </Text>
+  </ScrollView>
+)}
 
             {!updateStatus ? (
               <TouchableOpacity
@@ -670,7 +680,7 @@ export default function Home({}) {
                   let timeOut = setTimeout(() => {
                     setShowPolicy(false);
                     return () => {};
-                  }, 150);
+                  }, 100);
 
                   const currentVersion = VersionCheck.getCurrentVersion();
 
@@ -683,7 +693,7 @@ export default function Home({}) {
                   Animated.timing(animated, {
                     toValue: showPolicy || updateStatus ? 100 : 0,
                     // toValue:100,
-                    duration: 150,
+                    duration: 100,
                     useNativeDriver: false,
                   }).start();
                 }}
@@ -713,13 +723,13 @@ export default function Home({}) {
                       setShowPolicy(false);
                       SetUpdateStatus(false);
                       return () => {};
-                    }, 150);
+                    }, 100);
                     exitUpdate();
 
                     Animated.timing(animated, {
                       toValue: showPolicy || updateStatus ? 100 : 0,
                       // toValue:100,
-                      duration: 150,
+                      duration: 100,
                       useNativeDriver: false,
                     }).start();
 
@@ -759,12 +769,12 @@ export default function Home({}) {
                       setShowPolicy(false);
                       SetUpdateStatus(false);
                       return () => {};
-                    }, 150);
+                    }, 100);
 
                     acceptUpdate();
                     Animated.timing(animated, {
                       toValue: showPolicy || updateStatus ? 100 : 0,
-                      duration: 150,
+                      duration: 100,
                       useNativeDriver: false,
                     }).start();
                   }}
