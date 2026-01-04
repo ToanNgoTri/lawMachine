@@ -175,15 +175,6 @@ export default function Home({}) {
     }
   }
 
-  //   async function DeleteInternal() {
-  //   console.log('delete');
-
-  //   const addInfo = await FileSystem.unlink(
-  //     Dirs.CacheDir + '/Appear.txt'
-  //   );
-
-  // }
-
   async function getContentExist() {
     if (await FileSystem.exists(Dirs.CacheDir + '/order.txt', 'utf8')) {
       setShowBackground(false);
