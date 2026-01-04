@@ -72,7 +72,6 @@ export function Detail2({}) {
 
   const FlatListToScroll = useRef(null);
 
-  console.log(1);
 
   const dispatch = useDispatch();
 
@@ -475,7 +474,6 @@ export function Detail2({}) {
     let detailId = title.id.item;
     let i = title.id.index;
 
-    console.log('detailId', detailId);
 
     const dateLawDaySign = new Date(SearchResult[detailId]['lawDaySign']);
 
@@ -918,11 +916,6 @@ export function Detail2({}) {
                 justifyContent: 'center',
               }}
             >
-              {/* <ActivityIndicator
-                size="small"
-                color="white"
-                // style={{ backgroundColor: 'blue' }}
-              ></ActivityIndicator> */}
 
               <Text
                 style={{
@@ -976,7 +969,6 @@ export function Detail2({}) {
           <></>
         )}
       </View>
-      {/* </ScrollView> */}
       {showFilter && (
         <>
           <Animated.View
@@ -1037,8 +1029,6 @@ export function Detail2({}) {
               },
               shadowRadius: 4,
               elevation: 20,
-              // borderWidth:1,
-              // borderColor:'#363636',
             }}
           >
             <View

@@ -62,8 +62,6 @@ export function Detail1({}) {
   const netInfo = useNetInfo();
   let internetConnected = netInfo.isConnected;
 
-  console.log(2);
-
   useEffect(() => {
     setChoosenLaw(
       Object.keys(SearchResult).length ? Object.keys(SearchResult) : [],
@@ -261,8 +259,6 @@ export function Detail1({}) {
     data => (
       <Item
         id={data}
-        // title={SearchResult[data]}
-        // valueInput={valueInput}
       />
     ),
     [SearchResult, input],
@@ -427,12 +423,6 @@ export function Detail1({}) {
           borderBottomColor: 'white',
         }}
       >
-        {/* <TouchableWithoutFeedback
-          onPress={() => {
-            Keyboard.dismiss();
-          }}>
-          <Text style={styles.titleText}>{`Tìm kiếm nội dung`}</Text>
-        </TouchableWithoutFeedback> */}
         <View style={{ ...styles.inputContainer, height: 52, top: 5 }}>
           <View style={{ ...styles.containerBtb, paddingTop: 5 }}>
             <TouchableOpacity
@@ -520,15 +510,6 @@ export function Detail1({}) {
                 onSubmitEditing={() => {
                   pressToSearch();
                 }}
-                // onTouchEnd={() => {
-                //   if (textInputFocus) {
-                //     textInput.current.blur();
-                //     setTextInputFocus(false);
-                //   } else {
-                //     setTextInputFocus(true);
-                //     textInput.current.focus();
-                //   }
-                // }}
                 onFocus={() => setTextInputFocus(true)}
                 onBlur={() => setTextInputFocus(false)}
               ></TextInput>
@@ -553,11 +534,6 @@ export function Detail1({}) {
                       color: 'black',
                       fontSize: 20,
                       paddingRight: 8,
-                      // textAlign: 'center',
-                      // width: 20,
-                      // height: 20,
-
-                      // textAlign:'right'
                     }}
                   ></Ionicons>
                 )}
@@ -738,7 +714,6 @@ export function Detail1({}) {
           />
         )}
       </View>
-      {/* </ScrollView> */}
 
       {showFilter && (
         <>
@@ -792,8 +767,6 @@ export function Detail1({}) {
               borderRadius: 20,
               transform: [{ scale: Scale }],
               overflow: 'hidden',
-              // borderWidth:1,
-              // borderColor:'brown',
               shadowColor: 'black',
               shadowOpacity: 1,
               shadowOffset: {
@@ -910,7 +883,6 @@ export function Detail1({}) {
                   color: 'black',
                   fontWeight: 'bold',
                   marginLeft: 5,
-                  // backgroundColor:'green'
                 }}
               >
                 Tất cả
@@ -924,7 +896,6 @@ export function Detail1({}) {
                   paddingLeft: '10%',
                   paddingRight: '5%',
                   display: 'flex',
-                  // flexDirection:'row'
                 }}
               >
                 {SearchResult &&
@@ -1028,20 +999,6 @@ export function Detail1({}) {
                   })}
               </View>
             </ScrollView>
-
-            {/* <FlatList
-              onScrollBeginDrag={() => Keyboard.dismiss()}
-              data={Object.keys(SearchResult)}
-              renderItem={(item) => <ItemForFilter data={item}  />}
-              style={{
-                  paddingTop: 10,
-                  paddingLeft: '10%',
-                  paddingRight: '5%',
-                  display: 'flex',
-                  // flexDirection:'row'
-              }}
-            /> */}
-
             <TouchableOpacity
               style={{
                 backgroundColor: 'green',
@@ -1059,9 +1016,6 @@ export function Detail1({}) {
                   duration: 300,
                   useNativeDriver: false,
                 }).start();
-                // if(checkedAllFilter){
-                //   setLawFilted(false)
-                // }
                 setPaper(1);
                 if (FlatListToScroll.current) {
                   FlatListToScroll.current.scrollToOffset({ offset: 0 });

@@ -16,7 +16,6 @@ import {
   ActivityIndicator,
   Pressable,
   Vibration,
-  Butt2n,
 } from 'react-native';
 import { Dirs, FileSystem } from 'react-native-file-access';
 import React, { useState, useEffect, useRef } from 'react';
@@ -39,11 +38,6 @@ let eachSectionWithChapter = [];
 //lineHeight trong lines phải luôn nhỏ hơn trong highlight và View Hightlight
 
 export function Detail5() {
-  // const headerHeight = useAnimatedHeaderHeight();
-  // const headerHeight = useHeaderHeight();
-  // console.log('headerHeight', headerHeight);
-
-  // const [tittle, setTittle] = useState();     // để collapse chương nếu không có mục 'phần thứ...' hoặc mục' phần thứ...' nếu có
   const [tittleArray, setTittleArray] = useState([]); // đây là 'phần thứ...' hoặc chương (nói chung là section cao nhất)
 
   const [tittleArray2, setTittleArray2] = useState([]); // nếu có 'phần thứ...' thì đây sẽ là chương
@@ -72,6 +66,9 @@ export function Detail5() {
 
   const netInfo = useNetInfo();
   let internetConnected = netInfo.isConnected;
+
+  console.log(1);
+  
 
   async function StoreInternal() {
     async function k() {
@@ -172,8 +169,6 @@ export function Detail5() {
   const [find, setFind] = useState();
 
   const [input, setInput] = useState(route.params ? route.params.input : '');
-  // const [find, setFind] = useState(route.params ? route.params.input? true : false: true);
-  // const [go, setGo] = useState(route.params ? true : false);
 
   const [go, setGo] = useState(false);
 
@@ -512,27 +507,35 @@ export function Detail5() {
     }
   }
 
-  let positionYArrArticalDemo = positionYArrArtical;
+  let positionYArrArticalDemo = {'ORD':positionYArrArtical,"COPY":positionYArrArtical};
 
-  function setPositionYArtical({ y, key3 }) {
-    // console.log('positionYArrArtical',positionYArrArtical);
-    if (positionYArrArtical && positionYArrArticalDemo) {
-      var contains = positionYArrArtical.some((elem, i) => {
+  console.log(positionYArrArtical);
+function setPositionYArtical({ y, key3 }) {
+  const value = y + currentY - insets.top + 15;
+    console.log('setPositionYArtical');
+    
+  setPositionYArrArtical(prev => {
+    const index = prev.findIndex(obj => Object.keys(obj)[0] === key3);
 
-        return key3 == Object.keys(elem)[0];
-      });
+    // đã tồn tại → cập nhật
 
-      if (contains) {
-      } else {
 
-        if (Platform.OS == 'ios') {
-          positionYArrArtical.push({ [key3]: y + currentY - insets.top + 15 });
-        } else {
-          positionYArrArtical.push({ [key3]: y + currentY - insets.top + 15 });
-        }
-      }
+    if (index !== -1) {
+      const newArr = [...prev];
+      newArr[index] = { [key3]: value };
+
+    for(let i=0;i<prev.length - index;i++){
+      newArr[index+i] = { [Object.keys(newArr[index+i])[0]] : Object.values(newArr[index+i])[0] + (value - Object.values(prev[index])[0])};
     }
-  }
+
+      return newArr;
+    }
+
+
+    // chưa tồn tại → thêm mới
+    return [...prev, { [key3]: value }];
+  });
+}
 
   TopUnitCount = Content && Object.keys(Content).length;
 
@@ -1023,6 +1026,7 @@ export function Detail5() {
                   }}
                   ref={list}
                   showsVerticalScrollIndicator={true}
+               //   scrollEventThrottle={100}   // nếu thêm cái này thì từ tìm được lần thứ 2 trở đi sẽ không đúng vị trí nữa
                 >
                   <Text key={'abc'} style={styles.titleText}>
                     {Info && Info['lawNameDisplay']}
@@ -1687,16 +1691,6 @@ export function Detail5() {
                           justifyContent: 'center',
                         }}
                       >
-                        {/* <Text
-              style={{
-                // backgroundColor: 'red',
-                paddingLeft: 10,
-                paddingRight: 5,
-                fontSize: 15,
-                color: 'white',
-              }}>
-              Xóa
-            </Text> */}
                         <Ionicons
                           name="trash-outline"
                           style={{
