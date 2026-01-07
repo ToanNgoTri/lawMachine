@@ -166,11 +166,11 @@ export function Detail5() {
   const textInputFind = useRef(null);
   const textInputArticle = useRef(null);
   const [valueInput, setValueInput] = useState('');
-  const [find, setFind] = useState();
+  const [find, setFind] = useState();   // hiển thị trường tìm kiếm
 
   const [input, setInput] = useState(route.params ? route.params.input : '');
 
-  const [go, setGo] = useState(false);
+  const [go, setGo] = useState(false);    // tạo thay đổi layout để View highlight có thể lấy đúng vị trí Y
 
   const [Content, setContent] = useState([]);
   const [Info, setInfo] = useState({});
@@ -507,9 +507,8 @@ export function Detail5() {
     }
   }
 
-  let positionYArrArticalDemo = {'ORD':positionYArrArtical,"COPY":positionYArrArtical};
 
-  console.log(positionYArrArtical);
+  // console.log(positionYArrArtical);
 function setPositionYArtical({ y, key3 }) {
   const value = y + currentY - insets.top + 15;
     console.log('setPositionYArtical');
