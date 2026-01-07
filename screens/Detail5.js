@@ -11,7 +11,6 @@ import {
   Dimensions,
   Modal,
   Image,
-  Platform,
   KeyboardAvoidingView,
   ActivityIndicator,
   Pressable,
