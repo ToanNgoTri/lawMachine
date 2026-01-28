@@ -46,7 +46,7 @@ export function Detail2({}) {
   ); // đây Object là các luật, điểm, khoản có kết quả tìm kiếm
   // console.log('info3',info3);
   
-  console.log('SearchResult', SearchResult);
+  // console.log('SearchResult', SearchResult);
   const [inputFilter, setInputFilter] = useState('');
   const [showFilter, setShowFilter] = useState(false);
 
@@ -1157,8 +1157,8 @@ export function Detail2({}) {
               >
                 {SearchResult && 
                   Object.keys(SearchResult).map((key, i) => {
-                    console.log('key', key);
-                    console.log('SearchResult',SearchResult);
+                    // console.log('key', key);
+                    // console.log('SearchResult',SearchResult);
                     // if(key !== '_id'){
 
                     let nameLaw = SearchResult[key]['lawNameDisplay'];
