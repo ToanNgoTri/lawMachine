@@ -35,7 +35,7 @@ export function Detail1({}) {
 
   const [checkedAllFilter, setCheckedAllFilter] = useState(true);
 
-  const [textInputFocus, setTextInputFocus] = useState(false);
+  // const [textInputFocus, setTextInputFocus] = useState(false);
 
   const [textInputFilterFocus, setTextInputFilterFocus] = useState(false);
 
@@ -510,8 +510,8 @@ export function Detail1({}) {
                 onSubmitEditing={() => {
                   pressToSearch();
                 }}
-                onFocus={() => setTextInputFocus(true)}
-                onBlur={() => setTextInputFocus(false)}
+                // onFocus={() => setTextInputFocus(true)}
+                // onBlur={() => setTextInputFocus(false)}
               ></TextInput>
               <TouchableOpacity
                 onPress={() => {
