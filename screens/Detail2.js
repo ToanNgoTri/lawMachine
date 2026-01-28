@@ -38,12 +38,15 @@ export function Detail2({}) {
 
   const [paper, setPaper] = useState(0);
 
+  
+  
   const [SearchResult, setSearchResult] = useState(
     // info3 ? convertResult(info3.slice(0, 10)) : [],
     [],
   ); // đây Object là các luật, điểm, khoản có kết quả tìm kiếm
   // console.log('info3',info3);
-
+  
+  console.log('SearchResult', SearchResult);
   const [inputFilter, setInputFilter] = useState('');
   const [showFilter, setShowFilter] = useState(false);
 
@@ -89,7 +92,7 @@ export function Detail2({}) {
 
   function LawFilterContent(choosenLaw, SearchResult) {
     let contentFilted = {};
-    Object.keys(SearchResult).filter(key => {
+    SearchResult &&  Object.keys(SearchResult).filter(key => {
       if (choosenLaw.includes(key)) {
         contentFilted[key] = SearchResult[key];
       }
@@ -252,7 +255,7 @@ export function Detail2({}) {
 
   useEffect(() => {
     setChoosenLaw(
-      Object.keys(SearchResult).length ? Object.keys(SearchResult) : [],
+      SearchResult &&Object.keys(SearchResult).length ? Object.keys(SearchResult) : [],
     );
   }, [SearchResult]);
 
@@ -308,10 +311,8 @@ export function Detail2({}) {
         setLawFilted(contentLastedLaw['lastedLaw']);
       } else {
         dispatch({ type: 'getlastedlaws' });
-        // console.log(2);
       }
     } else {
-      // console.log(3);
 
       dispatch({ type: 'getlastedlaws' });
     }
@@ -352,7 +353,7 @@ export function Detail2({}) {
         return JSON.parse(FileOrder);
       }
     } else {
-      return JSON.parse('{"lastedLaw": {"_id":"none"}}');
+      return JSON.parse('{"lastedLaw": null}');
     }
   }
 
@@ -371,7 +372,7 @@ export function Detail2({}) {
 
     if (
       // choosenKindLaw.length &&
-      Object.keys(SearchResult).length &&
+      SearchResult && Object.keys(SearchResult).length &&
       SearchResult['_id'] !== 'none'
     ) {
       Object.keys(SearchResult).map((law, i) => {
@@ -934,7 +935,7 @@ export function Detail2({}) {
           </View>
         )}
 
-        {info5 != null && info5.length == 0 ? (
+        { (info5 != null && info5.length == 0 )|| !SearchResult ? (
           <NoneOfResutl style={{ backgroundColor: 'red' }} />
         ) : Object.keys(SearchResult).length || info3.length || info5 ? (
           <FlatList
@@ -1154,8 +1155,12 @@ export function Detail2({}) {
                   // flexDirection:'row'
                 }}
               >
-                {SearchResult &&
+                {SearchResult && 
                   Object.keys(SearchResult).map((key, i) => {
+                    console.log('key', key);
+                    console.log('SearchResult',SearchResult);
+                    // if(key !== '_id'){
+
                     let nameLaw = SearchResult[key]['lawNameDisplay'];
                     let lawDescription = SearchResult[key]['lawDescription'];
 
@@ -1193,8 +1198,8 @@ export function Detail2({}) {
                       );
                     }
                     if (
-                      nameLaw.match(new RegExp(inputSearchLawReg, 'igm')) ||
-                      lawDescription.match(new RegExp(inputSearchLawReg, 'igm'))
+                      (nameLaw && nameLaw.match(new RegExp(inputSearchLawReg, 'igm'))) ||
+                     (lawDescription && lawDescription.match(new RegExp(inputSearchLawReg, 'igm')))
                     ) {
                       return (
                         <TouchableOpacity
