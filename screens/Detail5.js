@@ -510,25 +510,31 @@ export function Detail5() {
   // console.log(positionYArrArtical);
 function setPositionYArtical({ y, key3 }) {
   const value = y + currentY - insets.top + 15;
-    console.log('setPositionYArtical');
-    
+
   setPositionYArrArtical(prev => {
-    const index = prev.findIndex(obj => Object.keys(obj)[0] === key3);
+    const index = prev.findIndex(
+      obj => Object.keys(obj)[0] === key3
+    );
 
     // đã tồn tại → cập nhật
-
-
     if (index !== -1) {
       const newArr = [...prev];
+
+      const oldValue = Object.values(prev[index])[0];
+      const delta = value - oldValue;
+
+      // update chính nó
       newArr[index] = { [key3]: value };
 
-    for(let i=0;i<prev.length - index;i++){
-      newArr[index+i] = { [Object.keys(newArr[index+i])[0]] : Object.values(newArr[index+i])[0] + (value - Object.values(prev[index])[0])};
-    }
+      // update các item phía sau
+      for (let i = index + 1; i < newArr.length; i++) {
+        const k = Object.keys(newArr[i])[0];
+        const v = Object.values(newArr[i])[0];
+        newArr[i] = { [k]: v + delta };
+      }
 
       return newArr;
     }
-
 
     // chưa tồn tại → thêm mới
     return [...prev, { [key3]: value }];
