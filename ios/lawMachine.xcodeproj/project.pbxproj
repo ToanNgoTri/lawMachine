@@ -297,7 +297,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 36;
+				CURRENT_PROJECT_VERSION = 37;
 				DEVELOPMENT_TEAM = WRLJ8WQ46Z;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = lawMachine/Info.plist;
@@ -306,7 +306,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.876;
+				MARKETING_VERSION = 2.877;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -329,7 +329,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 36;
+				CURRENT_PROJECT_VERSION = 37;
 				DEVELOPMENT_TEAM = WRLJ8WQ46Z;
 				INFOPLIST_FILE = lawMachine/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
@@ -337,7 +337,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.876;
+				MARKETING_VERSION = 2.877;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
