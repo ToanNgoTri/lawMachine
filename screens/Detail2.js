@@ -621,7 +621,7 @@ export function Detail2({}) {
       <View
         style={{
           backgroundColor: 'green',
-          paddingTop: insets.top /2,
+          paddingTop: 10,
           borderBottomWidth: 1,
           borderBottomColor: 'black',
         }}

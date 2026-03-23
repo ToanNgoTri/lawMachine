@@ -64,6 +64,7 @@ const toastConfig = {
 };
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { LogBox } from 'react-native';
 
 const ToastCustom = ({ text1, text2 }) => {
   return (
@@ -207,6 +208,7 @@ function App() {
     outputRange: [1, 0],
   });
 
+   console.log('bottom',insets.bottom)
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
@@ -571,7 +573,7 @@ function App() {
               style={{
                 flex: 1,
                 display: 'flex',
-                paddingBottom: insets.bottom,
+                paddingBottom: Platform.OS == 'ios' ? insets.bottom/2:insets.bottom,
                 paddingTop: insets.top,
               }}
             >

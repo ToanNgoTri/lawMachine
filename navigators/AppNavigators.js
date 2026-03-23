@@ -140,8 +140,6 @@ const AppNavigators = () => {
           ) {
             global.SearchContentRef.scrollToOffset({ offset: 0 });
           }
-              console.log('top',insets.top);
-              console.log('bottom',insets.bottom);
           
           return (
             <View
