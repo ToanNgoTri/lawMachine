@@ -15,6 +15,7 @@ import {
   ActivityIndicator,
   Pressable,
   Vibration,
+  Platform
 } from 'react-native';
 import { Dirs, FileSystem } from 'react-native-file-access';
 import React, { useState, useEffect, useRef } from 'react';
@@ -937,7 +938,7 @@ function setPositionYArtical({ y, key3 }) {
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior="padding"
-        keyboardVerticalOffset={ -13}
+        keyboardVerticalOffset={ Platform.OS == 'ios' ?insets.bottom-11:-13}
       >
         <View style={{ flex: 1, position: 'relative' }}>
           <View
