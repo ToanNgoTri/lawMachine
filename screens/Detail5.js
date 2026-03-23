@@ -2103,7 +2103,7 @@ const styles = StyleSheet.create({
   findArea: {
     display: 'flex',
     flexDirection: 'column',
-    bottom: -11,
+    // bottom: -11,
     position: 'absolute',
     right: 0,
     left: 0,
