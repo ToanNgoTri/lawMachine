@@ -602,7 +602,7 @@ function setPositionYArtical({ y, key3 }) {
 
   let transY = animatedForNavi.interpolate({
     inputRange: [-100, 0, 80, 90, 100],
-    outputRange: [0, 0, -50 - insets.bottom / 2, 0, 0],
+    outputRange: [0, 0, -51 , 0, 0],
   });
 
   let transX = animatedForNavi.interpolate({
@@ -618,9 +618,9 @@ function setPositionYArtical({ y, key3 }) {
   let MagginBottom = animatedForNavi.interpolate({
     inputRange: [-100, 0, 80, 90, 100],
     outputRange: [
-      50 + insets.bottom / 2,
-      50 + insets.bottom / 2,
-      90 + insets.bottom / 2,
+      50 ,
+      50 ,
+      90 ,
       10,
       10,
     ],
@@ -937,7 +937,7 @@ function setPositionYArtical({ y, key3 }) {
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior="padding"
-        keyboardVerticalOffset={-insets.bottom / 2 - 38}
+        keyboardVerticalOffset={ -13}
       >
         <View style={{ flex: 1, position: 'relative' }}>
           <View
@@ -2103,7 +2103,7 @@ const styles = StyleSheet.create({
   findArea: {
     display: 'flex',
     flexDirection: 'column',
-    // bottom: -11,
+    bottom: -11,
     position: 'absolute',
     right: 0,
     left: 0,
