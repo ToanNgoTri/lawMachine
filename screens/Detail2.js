@@ -743,17 +743,6 @@ export function Detail2({}) {
                 )}
               </TouchableOpacity>
             </View>
-            {/* <Text
-              style={{
-                color: '#FF4500',
-                fontSize: 12,
-                textAlign: 'center',
-                fontWeight: 'bold',
-                lineHeight: 14,
-              }}
-            >
-              {warning ? 'Vui lòng nhập từ khóa hợp lệ' : ' '}
-            </Text> */}
           </View>
           <View style={{ ...styles.containerBtb, paddingTop: -5 }}>
             <TouchableOpacity

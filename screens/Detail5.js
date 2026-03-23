@@ -1161,14 +1161,6 @@ function setPositionYArtical({ y, key3 }) {
                       }}
                       placeholder=" Nhập từ điều luật ..."
                       placeholderTextColor={'gray'}
-                      // onTouchEnd={() => {
-                      //   if (textInputFocus) {
-                      //     textInputArticle.current.blur();
-                      //     setTextInputFocus(false);
-                      //   } else {
-                      //     setTextInputFocus(true);
-                      //     textInputArticle.current.focus();
-                      //   }}}
                     ></TextInput>
                     <TouchableOpacity
                       onPress={() => {
