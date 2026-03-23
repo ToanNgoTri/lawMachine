@@ -621,7 +621,7 @@ export function Detail2({}) {
       <View
         style={{
           backgroundColor: 'green',
-          paddingTop: insets.top + 5,
+          paddingTop: insets.top /2,
           borderBottomWidth: 1,
           borderBottomColor: 'black',
         }}
@@ -861,7 +861,7 @@ export function Detail2({}) {
         </View>
       </View>
 
-      <View style={{ marginTop: 0, flex: 1, backgroundColor: '#EEEFE4' }}>
+      <View style={{ marginTop: 0, flex: 1, backgroundColor: '#EEEFE4',marginBottom: 0 }}>
         {loading5 && (
           <TouchableOpacity
             style={{
@@ -956,12 +956,12 @@ export function Detail2({}) {
                 <>
                   <ActivityIndicator color="black" />
                   <View
-                    style={{ height: 50 + insets.bottom / 2, width: 10 }}
+                    style={{ height: 50 , width: 10 }}
                   ></View>
                 </>
               ) : (
                 <View
-                  style={{ height: 50 + insets.bottom / 2, width: 10 }}
+                  style={{ height: 50 , width: 10 }}
                 ></View>
               )
             }

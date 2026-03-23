@@ -253,7 +253,7 @@ export default function Home({}) {
   }
 
   return (
-    <>
+    <View>
       <View
         style={{
           flexDirection: 'column',
@@ -268,13 +268,13 @@ export default function Home({}) {
           flexDirection: 'column',
         }}
       >
-        <View
+        {/* <View
           style={{
             backgroundColor: 'green',
-            height: insets.top,
+            height: insets.top*2,
             width: '150%',
           }}
-        ></View>
+        ></View> */}
         <View style={{ flexDirection: 'row' }}>
           <View
             style={{
@@ -362,7 +362,7 @@ export default function Home({}) {
             ListFooterComponent={() => (
               <View
                 style={{
-                  height: 94 + insets.bottom / 2 + insets.top,
+                  height: 145  ,
                   width: '100%',
                 }}
               ></View>
@@ -371,7 +371,7 @@ export default function Home({}) {
         </View>
       )}
 
-    </>
+    </View>
   );
 }
 

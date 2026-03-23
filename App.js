@@ -18,7 +18,7 @@ import {
   Linking,
   Platform
 } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import 'react-native-gesture-handler';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Dirs, FileSystem } from 'react-native-file-access';
@@ -102,6 +102,8 @@ function App() {
   const updateShowBoxInHomeScreen = data => {
     setShowBoxInHomeScreen(data);
   };
+
+  const insets = useSafeAreaInsets();
 
   async function getPolicyAppear() {
     if (await FileSystem.exists(Dirs.CacheDir + '/Appear.txt', 'utf8')) {
@@ -565,8 +567,17 @@ function App() {
                   </Animated.View>
                 </>
               )}
+              <View
+              style={{
+                flex: 1,
+                display: 'flex',
+                paddingBottom: insets.bottom,
+                paddingTop: insets.top,
+              }}
+            >
 
               <StackNavigator />
+              </View>
             </RefOfHome.Provider>
           </BoxInHomeScreen.Provider>
         </Provider>

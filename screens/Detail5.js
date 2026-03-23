@@ -944,7 +944,7 @@ function setPositionYArtical({ y, key3 }) {
             style={{
               top: 0,
               backgroundColor: 'green',
-              height: insets.top,
+              // height: insets.top*3/2,
               position: 'absolute',
               width: widthDevice,
               zIndex: 101,
@@ -954,7 +954,7 @@ function setPositionYArtical({ y, key3 }) {
             style={{
               display: 'flex',
               flexDirection: 'row',
-              top: insets.top,
+              top: 0,
               width: widthDevice,
               backgroundColor: 'green',
               position: 'relative',
@@ -1019,7 +1019,7 @@ function setPositionYArtical({ y, key3 }) {
           {Boolean(Content.length) && (
             <>
               <Animated.View
-                style={{ marginBottom: MagginBottom, marginTop: insets.top }}
+                style={{ marginBottom: MagginBottom }}
               >
                 <ScrollView
                   onScroll={event => {
@@ -1136,8 +1136,8 @@ function setPositionYArtical({ y, key3 }) {
                     ...styles.listArticle,
                     width: (widthDevice / 100) * 60,
                     transform: [{ translateX: transX }],
-                    marginBottom: 40 + insets.bottom / 2,
-                    marginTop: insets.top + 50,
+                    marginBottom: 40 ,
+                    marginTop: 50,
                   }}
                 >
                   <View
@@ -1242,8 +1242,8 @@ function setPositionYArtical({ y, key3 }) {
           <View
             style={{
               ...styles.functionTab,
-              paddingBottom: 3 + insets.bottom / 2,
-              height: 40 + insets.bottom / 2,
+              // paddingBottom: 3 + insets.bottom / 2,
+              height: 40 ,
               // bottom:-(insets.bottom + insets.top),
             }}
           >
@@ -1595,7 +1595,7 @@ function setPositionYArtical({ y, key3 }) {
                     flexDirection: 'row',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    height: 60,
+                    height: 50,
                     borderColor: '#2F4F4F',
                   }}
                 >
@@ -1606,7 +1606,7 @@ function setPositionYArtical({ y, key3 }) {
                     style={{
                       alignItems: 'center',
                       justifyContent: 'center',
-                      height: 60,
+                      height: 50,
                       width: 60,
                       // borderWidth:4,
                       borderColor: 'black',
@@ -1645,7 +1645,7 @@ function setPositionYArtical({ y, key3 }) {
                         style={{
                           alignItems: 'center',
                           width: 70,
-                          height: 60,
+                          height: 50,
                           alignItems: 'center',
                           justifyContent: 'center',
                         }}
@@ -1690,7 +1690,7 @@ function setPositionYArtical({ y, key3 }) {
                           // padding: 20,
                           alignItems: 'center',
                           width: 70,
-                          height: 60,
+                          height: 50,
                           alignItems: 'center',
                           justifyContent: 'center',
                         }}

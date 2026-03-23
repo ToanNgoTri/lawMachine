@@ -140,18 +140,20 @@ const AppNavigators = () => {
           ) {
             global.SearchContentRef.scrollToOffset({ offset: 0 });
           }
-
+              console.log('top',insets.top);
+              console.log('bottom',insets.bottom);
+          
           return (
             <View
               style={{
                 flexDirection: 'row',
-                bottom: -10,
+                bottom: 0,
                 position: 'absolute',
                 backgroundColor: 'white',
                 width: '100%',
                 justifyContent: 'space-around',
                 alignItems: 'center',
-                height: 60 + insets.bottom / 2,
+                height: 50 ,
                 borderTopRightRadius: 15,
                 borderTopLeftRadius: 15,
                 display: 'flex',
@@ -170,7 +172,7 @@ const AppNavigators = () => {
                   justifyContent: 'center',
                   position: 'relative',
                   height: 44,
-                  bottom: 7 + insets.bottom / 6,
+                  // bottom: 7 + insets.bottom / 6,
                   transform: [{ scale: homeTabIconSize }, { translateX: 7 }],
                 }}
               >
@@ -276,7 +278,7 @@ const AppNavigators = () => {
                   justifyContent: 'center',
                   position: 'relative',
                   height: 44,
-                  bottom: 7 + insets.bottom / 6,
+                  // bottom: 7 + insets.bottom / 6,
                   transform: [{ scale: searchLawTabIconSize }],
                 }}
               >
@@ -375,7 +377,7 @@ const AppNavigators = () => {
                 style={{
                   alignItems: 'center',
                   minWidth: 100,
-                  bottom: 7 + insets.bottom / 6,
+                  // bottom: 7 + insets.bottom / 6,
                   display: 'flex',
                   flexDirection: 'column',
                   overflow: 'hidden',

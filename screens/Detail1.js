@@ -418,7 +418,7 @@ export function Detail1({}) {
       <View
         style={{
           backgroundColor: '#222222',
-          paddingTop: insets.top + 5,
+          paddingTop: insets.top/2,
           borderBottomWidth: 1,
           borderBottomColor: 'white',
         }}
@@ -702,12 +702,12 @@ export function Detail1({}) {
                 <>
                   <ActivityIndicator color="black" />
                   <View
-                    style={{ height: 50 + insets.bottom / 2, width: 10 }}
+                    style={{ height: 50 , width: 10 }}
                   ></View>
                 </>
               ) : (
                 <View
-                  style={{ height: 50 + insets.bottom / 2, width: 10 }}
+                  style={{ height: 50 , width: 10 }}
                 ></View>
               )
             }
