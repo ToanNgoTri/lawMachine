@@ -225,7 +225,7 @@ function App() {
         >
         </View> */}
 
-   <SafeAreaView  style={{ flex: 1 }} edges={['bottom']}>
+   <SafeAreaView  style={{ flex: 1 }} edges={[Platform.OS === 'ios' ? null : 'bottom']}>
         <Provider store={store}>
           <BoxInHomeScreen.Provider
             value={{ showBoxInHomeScreen, updateShowBoxInHomeScreen }}

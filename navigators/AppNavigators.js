@@ -22,6 +22,7 @@ import {
   TouchableOpacity,
   Animated,
   Dimensions,
+  Platform,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -129,13 +130,13 @@ const AppNavigators = () => {
             <View
               style={{
                 flexDirection: 'row',
-                bottom: 0,
+                bottom: Platform.OS === 'ios' ? 0 : 0,
                 position: 'absolute',
                 backgroundColor: 'white',
                 width: '100%',
                 justifyContent: 'space-around',
                 alignItems: 'center',
-                height: 50 ,
+                height: Platform.OS === 'ios' ? 65 : 50 ,
                 borderTopRightRadius: 15,
                 borderTopLeftRadius: 15,
                 display: 'flex',
@@ -146,6 +147,7 @@ const AppNavigators = () => {
             >
               <Animated.View
                 style={{
+                  top:Platform.OS === 'ios' ? -5 : 0,
                   alignItems: 'center',
                   minWidth: 100,
                   display: 'flex',
@@ -243,9 +245,9 @@ const AppNavigators = () => {
 
               <Animated.View
                 style={{
+                                    top:Platform.OS === 'ios' ? -5 : 0,
                   alignItems: 'center',
                   minWidth: 100,
-                  // backgroundColor: 'red',
                   display: 'flex',
                   flexDirection: 'column',
                   overflow: 'hidden',
@@ -342,6 +344,7 @@ const AppNavigators = () => {
 
               <Animated.View
                 style={{
+                  top:Platform.OS === 'ios' ? -5 : 0,
                   alignItems: 'center',
                   minWidth: 100,
                   display: 'flex',
