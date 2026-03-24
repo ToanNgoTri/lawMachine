@@ -208,9 +208,23 @@ function App() {
     outputRange: [1, 0],
   });
 
-   console.log('bottom',insets.bottom)
+   console.log('bottom',insets)
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
+                    <View
+        style={{
+          height: insets.top*4,
+          width: '100%',
+          // height:100,
+          backgroundColor: 'black',
+          position: 'absolute',
+          top:-insets.top*3,
+          left:0,
+          zIndex:1,
+        }}
+        >
+        </View>
+
       <SafeAreaProvider>
         <Provider store={store}>
           <BoxInHomeScreen.Provider
