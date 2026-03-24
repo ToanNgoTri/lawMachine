@@ -18,7 +18,7 @@ import {
   Linking,
   Platform
 } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import 'react-native-gesture-handler';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Dirs, FileSystem } from 'react-native-file-access';
@@ -64,6 +64,7 @@ const toastConfig = {
 };
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { LogBox } from 'react-native';
 
 const ToastCustom = ({ text1, text2 }) => {
   return (
@@ -102,6 +103,8 @@ function App() {
   const updateShowBoxInHomeScreen = data => {
     setShowBoxInHomeScreen(data);
   };
+
+  // const insets = useSafeAreaInsets();
 
   async function getPolicyAppear() {
     if (await FileSystem.exists(Dirs.CacheDir + '/Appear.txt', 'utf8')) {
@@ -205,9 +208,24 @@ function App() {
     outputRange: [1, 0],
   });
 
+  //  console.log('bottom',insets)
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider>
+                    {/* <View
+        style={{
+          height: insets.top*4,
+          width: '100%',
+          // height:100,
+          backgroundColor: 'green',
+          position: 'absolute',
+          top:-insets.top*3,
+          left:0,
+          zIndex:1,
+        }}
+        >
+        </View> */}
+
+   <SafeAreaView  style={{ flex: 1 }} edges={['bottom']}>
         <Provider store={store}>
           <BoxInHomeScreen.Provider
             value={{ showBoxInHomeScreen, updateShowBoxInHomeScreen }}
@@ -565,13 +583,36 @@ function App() {
                   </Animated.View>
                 </>
               )}
+              <View
+              style={{
+                flex: 1,
+                display: 'flex',
+                // paddingBottom: Platform.OS == 'ios' ? insets.bottom/2:insets.bottom,
+                // paddingTop: insets.top,
+              }}
+            >
 
               <StackNavigator />
+              </View>
             </RefOfHome.Provider>
           </BoxInHomeScreen.Provider>
         </Provider>
         <Toast config={toastConfig} />
-      </SafeAreaProvider>
+      </SafeAreaView>
+         {/* <View
+        style={{
+          height: Platform.OS === 'ios' ? insets.bottom * 3 / 2 : insets.bottom *2,
+          width: '100%',
+          // height:100,
+          backgroundColor: 'black',
+          position: 'absolute',
+          bottom:Platform.OS === 'ios' ?-insets.bottom:-insets.bottom ,
+          left:0,
+          zIndex:1,
+        }}
+        >
+        </View> */}
+
     </GestureHandlerRootView>
   );
 }
