@@ -216,7 +216,7 @@ function App() {
           height: insets.top*4,
           width: '100%',
           // height:100,
-          backgroundColor: 'black',
+          backgroundColor: 'green',
           position: 'absolute',
           top:-insets.top*3,
           left:0,
@@ -599,6 +599,20 @@ function App() {
         </Provider>
         <Toast config={toastConfig} />
       </SafeAreaProvider>
+                          <View
+        style={{
+          height: insets.bottom*3/2,
+          width: '100%',
+          // height:100,
+          backgroundColor: 'black',
+          position: 'absolute',
+          bottom:-insets.bottom,
+          left:0,
+          zIndex:1,
+        }}
+        >
+        </View>
+
     </GestureHandlerRootView>
   );
 }
