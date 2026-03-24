@@ -599,14 +599,14 @@ function App() {
         </Provider>
         <Toast config={toastConfig} />
       </SafeAreaProvider>
-                          <View
+         <View
         style={{
-          height: insets.bottom*3/2,
+          height: Platform.OS === 'ios' ? insets.bottom * 3 / 2 : insets.bottom *2,
           width: '100%',
           // height:100,
           backgroundColor: 'black',
           position: 'absolute',
-          bottom:-insets.bottom,
+          bottom:Platform.OS === 'ios' ?-insets.bottom:-insets.bottom ,
           left:0,
           zIndex:1,
         }}
