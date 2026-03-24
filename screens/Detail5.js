@@ -15,7 +15,6 @@ import {
   ActivityIndicator,
   Pressable,
   Vibration,
-  Platform
 } from 'react-native';
 import { Dirs, FileSystem } from 'react-native-file-access';
 import React, { useState, useEffect, useRef } from 'react';
@@ -603,7 +602,7 @@ function setPositionYArtical({ y, key3 }) {
 
   let transY = animatedForNavi.interpolate({
     inputRange: [-100, 0, 80, 90, 100],
-    outputRange: [0, 0, -51 , 0, 0],
+    outputRange: [0, 0, -50 - insets.bottom / 2, 0, 0],
   });
 
   let transX = animatedForNavi.interpolate({
@@ -619,9 +618,9 @@ function setPositionYArtical({ y, key3 }) {
   let MagginBottom = animatedForNavi.interpolate({
     inputRange: [-100, 0, 80, 90, 100],
     outputRange: [
-      50 ,
-      50 ,
-      90 ,
+      50 + insets.bottom / 2,
+      50 + insets.bottom / 2,
+      90 + insets.bottom / 2,
       10,
       10,
     ],
@@ -938,14 +937,14 @@ function setPositionYArtical({ y, key3 }) {
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior="padding"
-        keyboardVerticalOffset={ Platform.OS == 'ios' ?insets.bottom-11:-13}
+        keyboardVerticalOffset={-insets.bottom / 2 - 38}
       >
         <View style={{ flex: 1, position: 'relative' }}>
           <View
             style={{
               top: 0,
               backgroundColor: 'green',
-              // height: insets.top*3/2,
+              height: insets.top,
               position: 'absolute',
               width: widthDevice,
               zIndex: 101,
@@ -955,7 +954,7 @@ function setPositionYArtical({ y, key3 }) {
             style={{
               display: 'flex',
               flexDirection: 'row',
-              top: 0,
+              top: insets.top,
               width: widthDevice,
               backgroundColor: 'green',
               position: 'relative',
@@ -1020,7 +1019,7 @@ function setPositionYArtical({ y, key3 }) {
           {Boolean(Content.length) && (
             <>
               <Animated.View
-                style={{ marginBottom: MagginBottom }}
+                style={{ marginBottom: MagginBottom, marginTop: insets.top }}
               >
                 <ScrollView
                   onScroll={event => {
@@ -1137,8 +1136,8 @@ function setPositionYArtical({ y, key3 }) {
                     ...styles.listArticle,
                     width: (widthDevice / 100) * 60,
                     transform: [{ translateX: transX }],
-                    marginBottom: 40 ,
-                    marginTop: 50,
+                    marginBottom: 40 + insets.bottom / 2,
+                    marginTop: insets.top + 50,
                   }}
                 >
                   <View
@@ -1162,6 +1161,14 @@ function setPositionYArtical({ y, key3 }) {
                       }}
                       placeholder=" Nhập từ điều luật ..."
                       placeholderTextColor={'gray'}
+                      // onTouchEnd={() => {
+                      //   if (textInputFocus) {
+                      //     textInputArticle.current.blur();
+                      //     setTextInputFocus(false);
+                      //   } else {
+                      //     setTextInputFocus(true);
+                      //     textInputArticle.current.focus();
+                      //   }}}
                     ></TextInput>
                     <TouchableOpacity
                       onPress={() => {
@@ -1235,8 +1242,8 @@ function setPositionYArtical({ y, key3 }) {
           <View
             style={{
               ...styles.functionTab,
-              // paddingBottom: 3 + insets.bottom / 2,
-              height: 40 ,
+              paddingBottom: 3 + insets.bottom / 2,
+              height: 40 + insets.bottom / 2,
               // bottom:-(insets.bottom + insets.top),
             }}
           >
@@ -1588,7 +1595,7 @@ function setPositionYArtical({ y, key3 }) {
                     flexDirection: 'row',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    height: 50,
+                    height: 60,
                     borderColor: '#2F4F4F',
                   }}
                 >
@@ -1599,7 +1606,7 @@ function setPositionYArtical({ y, key3 }) {
                     style={{
                       alignItems: 'center',
                       justifyContent: 'center',
-                      height: 50,
+                      height: 60,
                       width: 60,
                       // borderWidth:4,
                       borderColor: 'black',
@@ -1638,7 +1645,7 @@ function setPositionYArtical({ y, key3 }) {
                         style={{
                           alignItems: 'center',
                           width: 70,
-                          height: 50,
+                          height: 60,
                           alignItems: 'center',
                           justifyContent: 'center',
                         }}
@@ -1683,7 +1690,7 @@ function setPositionYArtical({ y, key3 }) {
                           // padding: 20,
                           alignItems: 'center',
                           width: 70,
-                          height: 50,
+                          height: 60,
                           alignItems: 'center',
                           justifyContent: 'center',
                         }}

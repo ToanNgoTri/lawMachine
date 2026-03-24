@@ -417,8 +417,8 @@ export function Detail1({}) {
 
       <View
         style={{
-          backgroundColor: 'green',
-          paddingTop: 10,
+          backgroundColor: '#222222',
+          paddingTop: insets.top + 5,
           borderBottomWidth: 1,
           borderBottomColor: 'white',
         }}
@@ -490,7 +490,7 @@ export function Detail1({}) {
               style={{
                 position: 'relative',
                 flexDirection: 'row',
-                backgroundColor: 'black',
+                backgroundColor: 'white',
                 borderRadius: 15,
                 borderColor: warning ? '#FF4500' : 'none',
                 borderWidth: warning ? 1 : 0,
@@ -531,7 +531,7 @@ export function Detail1({}) {
                   <Ionicons
                     name="close-circle-outline"
                     style={{
-                      color: 'white',
+                      color: 'black',
                       fontSize: 20,
                       paddingRight: 8,
                     }}
@@ -702,12 +702,12 @@ export function Detail1({}) {
                 <>
                   <ActivityIndicator color="black" />
                   <View
-                    style={{ height: 50 , width: 10 }}
+                    style={{ height: 50 + insets.bottom / 2, width: 10 }}
                   ></View>
                 </>
               ) : (
                 <View
-                  style={{ height: 50 , width: 10 }}
+                  style={{ height: 50 + insets.bottom / 2, width: 10 }}
                 ></View>
               )
             }
@@ -1060,8 +1060,8 @@ const styles = StyleSheet.create({
   },
   inputArea: {
     width: '85%',
-    backgroundColor: 'black',
-    color: 'white',
+    backgroundColor: 'white',
+    color: 'black',
     paddingLeft: 12,
     borderRadius: 15,
     paddingTop: 10,

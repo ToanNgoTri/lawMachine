@@ -38,12 +38,14 @@ export function Detail2({}) {
 
   const [paper, setPaper] = useState(0);
 
+  
+  
   const [SearchResult, setSearchResult] = useState(
     // info3 ? convertResult(info3.slice(0, 10)) : [],
     [],
   ); // đây Object là các luật, điểm, khoản có kết quả tìm kiếm
   // console.log('info3',info3);
-
+  
   // console.log('SearchResult', SearchResult);
   const [inputFilter, setInputFilter] = useState('');
   const [showFilter, setShowFilter] = useState(false);
@@ -73,6 +75,7 @@ export function Detail2({}) {
 
   const FlatListToScroll = useRef(null);
 
+
   const dispatch = useDispatch();
 
   const animated = useRef(new Animated.Value(0)).current;
@@ -89,12 +92,11 @@ export function Detail2({}) {
 
   function LawFilterContent(choosenLaw, SearchResult) {
     let contentFilted = {};
-    SearchResult &&
-      Object.keys(SearchResult).filter(key => {
-        if (choosenLaw.includes(key)) {
-          contentFilted[key] = SearchResult[key];
-        }
-      });
+    SearchResult &&  Object.keys(SearchResult).filter(key => {
+      if (choosenLaw.includes(key)) {
+        contentFilted[key] = SearchResult[key];
+      }
+    });
     setLawFilted(contentFilted);
     // console.log('LawFilted',LawFilted);
   }
@@ -253,9 +255,7 @@ export function Detail2({}) {
 
   useEffect(() => {
     setChoosenLaw(
-      SearchResult && Object.keys(SearchResult).length
-        ? Object.keys(SearchResult)
-        : [],
+      SearchResult &&Object.keys(SearchResult).length ? Object.keys(SearchResult) : [],
     );
   }, [SearchResult]);
 
@@ -313,6 +313,7 @@ export function Detail2({}) {
         dispatch({ type: 'getlastedlaws' });
       }
     } else {
+
       dispatch({ type: 'getlastedlaws' });
     }
   }
@@ -371,8 +372,7 @@ export function Detail2({}) {
 
     if (
       // choosenKindLaw.length &&
-      SearchResult &&
-      Object.keys(SearchResult).length &&
+      SearchResult && Object.keys(SearchResult).length &&
       SearchResult['_id'] !== 'none'
     ) {
       Object.keys(SearchResult).map((law, i) => {
@@ -474,6 +474,7 @@ export function Detail2({}) {
   const Item = memo(title => {
     let detailId = title.id.item;
     let i = title.id.index;
+
 
     const dateLawDaySign = new Date(SearchResult[detailId]['lawDaySign']);
 
@@ -620,7 +621,7 @@ export function Detail2({}) {
       <View
         style={{
           backgroundColor: 'green',
-          paddingTop: 10,
+          paddingTop: insets.top + 5,
           borderBottomWidth: 1,
           borderBottomColor: 'black',
         }}
@@ -742,11 +743,23 @@ export function Detail2({}) {
                 )}
               </TouchableOpacity>
             </View>
+            {/* <Text
+              style={{
+                color: '#FF4500',
+                fontSize: 12,
+                textAlign: 'center',
+                fontWeight: 'bold',
+                lineHeight: 14,
+              }}
+            >
+              {warning ? 'Vui lòng nhập từ khóa hợp lệ' : ' '}
+            </Text> */}
           </View>
           <View style={{ ...styles.containerBtb, paddingTop: -5 }}>
             <TouchableOpacity
               disabled={loading5}
               style={{
+                
                 ...styles.inputBtb,
                 borderRadius: 100,
                 height: 40,
@@ -848,14 +861,7 @@ export function Detail2({}) {
         </View>
       </View>
 
-      <View
-        style={{
-          marginTop: 0,
-          flex: 1,
-          backgroundColor: '#EEEFE4',
-          marginBottom: 0,
-        }}
-      >
+      <View style={{ marginTop: 0, flex: 1, backgroundColor: '#EEEFE4' }}>
         {loading5 && (
           <TouchableOpacity
             style={{
@@ -911,6 +917,7 @@ export function Detail2({}) {
                 justifyContent: 'center',
               }}
             >
+
               <Text
                 style={{
                   color: 'white',
@@ -928,7 +935,7 @@ export function Detail2({}) {
           </View>
         )}
 
-        {(info5 != null && info5.length == 0) || !SearchResult ? (
+        { (info5 != null && info5.length == 0 )|| !SearchResult ? (
           <NoneOfResutl style={{ backgroundColor: 'red' }} />
         ) : Object.keys(SearchResult).length || info3.length || info5 ? (
           <FlatList
@@ -948,10 +955,14 @@ export function Detail2({}) {
               paper < Math.ceil(Object.keys(LawFilted).length / 30) ? (
                 <>
                   <ActivityIndicator color="black" />
-                  <View style={{ height: 50, width: 10 }}></View>
+                  <View
+                    style={{ height: 50 + insets.bottom / 2, width: 10 }}
+                  ></View>
                 </>
               ) : (
-                <View style={{ height: 50, width: 10 }}></View>
+                <View
+                  style={{ height: 50 + insets.bottom / 2, width: 10 }}
+                ></View>
               )
             }
           />
@@ -1144,7 +1155,7 @@ export function Detail2({}) {
                   // flexDirection:'row'
                 }}
               >
-                {SearchResult &&
+                {SearchResult && 
                   Object.keys(SearchResult).map((key, i) => {
                     // console.log('key', key);
                     // console.log('SearchResult',SearchResult);
@@ -1187,12 +1198,8 @@ export function Detail2({}) {
                       );
                     }
                     if (
-                      (nameLaw &&
-                        nameLaw.match(new RegExp(inputSearchLawReg, 'igm'))) ||
-                      (lawDescription &&
-                        lawDescription.match(
-                          new RegExp(inputSearchLawReg, 'igm'),
-                        ))
+                      (nameLaw && nameLaw.match(new RegExp(inputSearchLawReg, 'igm'))) ||
+                     (lawDescription && lawDescription.match(new RegExp(inputSearchLawReg, 'igm')))
                     ) {
                       return (
                         <TouchableOpacity
