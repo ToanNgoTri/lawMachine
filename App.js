@@ -18,7 +18,7 @@ import {
   Linking,
   Platform
 } from 'react-native';
-import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import 'react-native-gesture-handler';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Dirs, FileSystem } from 'react-native-file-access';
@@ -104,7 +104,7 @@ function App() {
     setShowBoxInHomeScreen(data);
   };
 
-  const insets = useSafeAreaInsets();
+  // const insets = useSafeAreaInsets();
 
   async function getPolicyAppear() {
     if (await FileSystem.exists(Dirs.CacheDir + '/Appear.txt', 'utf8')) {
@@ -208,10 +208,10 @@ function App() {
     outputRange: [1, 0],
   });
 
-   console.log('bottom',insets)
+  //  console.log('bottom',insets)
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-                    <View
+                    {/* <View
         style={{
           height: insets.top*4,
           width: '100%',
@@ -223,9 +223,9 @@ function App() {
           zIndex:1,
         }}
         >
-        </View>
+        </View> */}
 
-      <SafeAreaProvider>
+   <SafeAreaView  style={{ flex: 1 }} edges={['bottom']}>
         <Provider store={store}>
           <BoxInHomeScreen.Provider
             value={{ showBoxInHomeScreen, updateShowBoxInHomeScreen }}
@@ -587,8 +587,8 @@ function App() {
               style={{
                 flex: 1,
                 display: 'flex',
-                paddingBottom: Platform.OS == 'ios' ? insets.bottom/2:insets.bottom,
-                paddingTop: insets.top,
+                // paddingBottom: Platform.OS == 'ios' ? insets.bottom/2:insets.bottom,
+                // paddingTop: insets.top,
               }}
             >
 
@@ -598,8 +598,8 @@ function App() {
           </BoxInHomeScreen.Provider>
         </Provider>
         <Toast config={toastConfig} />
-      </SafeAreaProvider>
-         <View
+      </SafeAreaView>
+         {/* <View
         style={{
           height: Platform.OS === 'ios' ? insets.bottom * 3 / 2 : insets.bottom *2,
           width: '100%',
@@ -611,7 +611,7 @@ function App() {
           zIndex:1,
         }}
         >
-        </View>
+        </View> */}
 
     </GestureHandlerRootView>
   );
