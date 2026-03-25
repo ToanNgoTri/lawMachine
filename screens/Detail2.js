@@ -120,107 +120,82 @@ export function Detail2({}) {
     }
   }, [info3]);
 
-  function highlight(para, word, i2) {
-    // word = word.replace(/\s/img,'\\,?\\s\\,?')
-    // console.log(word);
-
-    if (para) {
-      // đôi khi Điều ... không có khoản (nội dung chính trong điều) thì điều này giúp không load ['']
-      if (word.match(/(\w+|\(|\)|\.|\+|\-|\,|\&|\?|\;|\!|\/)/gim)) {
-        let inputRexgex = para.match(
-          new RegExp(
-            String(
-              word
-                .replace(/\s/gim, ',?\\s,?')
-                .replace(/\./gim, '.')
-                .replace(/\\s/gim, '.'),
-            ),
-            'igmu',
-          ),
-        );
-        // let inputRexgex = para[0].match(new RegExp('hội', 'igmu'));
-        if (inputRexgex) {
-          let searchedPara = para
-            .split(
-              new RegExp(
-                String(
-                  word
-                    .replace(/\s/gim, ',?\\s,?')
-                    .replace(/\./gim, '.')
-                    .replace(/\\s/gim, '.'),
-                ),
-                'igmu',
-              ),
-            )
-            // .split(new RegExp('hội', 'igmu'))
-            .reduce((prev, current, i) => {
-              if (!i) {
-                return [
-                  <Text
-                    style={i2.match(/aa/) ? { ...styles.chapterText } : {}}
-                    key={`${i}xa`}
-                  >
-                    {current}
-                  </Text>,
-                ];
-              }
-
-              return prev.concat(
-                <React.Fragment key={`${i}htth`}>
-                  <Text
-                    style={
-                      i2.match(/aa/)
-                        ? { ...styles.chapterText, backgroundColor: 'yellow' }
-                        : { backgroundColor: 'yellow' }
-                    }
-                    key={`${i}gmi`}
-                  >
-                    {inputRexgex[i - 1]}
-                  </Text>
-                </React.Fragment>,
-                <Text
-                  key={`${i}vvv`}
-                  style={i2.match(/aa/) ? { ...styles.chapterText } : {}}
-                >
-                  {current}
-                </Text>,
-              );
-            }, []);
-          return (
-            <View>
-              <Text
-                style={
-                  i2.match(/aa/)
-                    ? { textAlign: 'center' }
-                    : { textAlign: 'justify' }
-                }
-              >
-                {'   '}
-                {searchedPara}
-              </Text>
-            </View>
-          );
-        } else {
-          return (
-            <Text>
-              {'   '}
-              {para}
-            </Text>
-          );
-        }
-      } else {
-        return (
-          <Text>
-            {'   '}
-            {para}
-          </Text>
-        );
-      }
-
-      // }
-    }
+function highlight(para, word, i2) {
+  if (!para || !word) {
+    return (
+      <Text>
+        {'   '}
+        {para}
+      </Text>
+    );
   }
 
+  const keywords = word
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')); // escape regex
+
+  if (!keywords.length) {
+    return (
+      <Text>
+        {'   '}
+        {para}
+      </Text>
+    );
+  }
+
+  // tạo regex dạng: (trộm|cắp|tài|sản)
+  const regex = new RegExp(`(${keywords.join('|')})`, 'giu');
+
+  const parts = para.split(regex);
+
+  const result = parts.map((part, index) => {
+    const isMatch = regex.test(part);
+
+    // reset regex vì test() với flag g sẽ bị lệch index
+    regex.lastIndex = 0;
+
+    if (isMatch) {
+      return (
+        <Text
+          key={index}
+          style={
+            i2.match(/aa/)
+              ? { ...styles.chapterText, backgroundColor: 'yellow' }
+              : { backgroundColor: 'yellow' }
+          }
+        >
+          {part}
+        </Text>
+      );
+    }
+
+    return (
+      <Text
+        key={index}
+        style={i2.match(/aa/) ? { ...styles.chapterText } : {}}
+      >
+        {part}
+      </Text>
+    );
+  });
+
+  return (
+    <View>
+      <Text
+        style={
+          i2.match(/aa/)
+            ? { textAlign: 'center' }
+            : { textAlign: 'justify' }
+        }
+      >
+        {'   '}
+        {result}
+      </Text>
+    </View>
+  );
+}
   function convertResult(info) {
     let lawObject = {};
     info.map((law, i) => {

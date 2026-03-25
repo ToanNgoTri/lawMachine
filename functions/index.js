@@ -21,27 +21,34 @@ const client = new MongoClient(
 
 
 export const  searchLawDescription = onRequest(async (req, res) => {
-  if (req.method === 'POST') {
+if (req.method === 'POST') {
+  try {
+    const database = client.db('LawMachine');
+    const LawContent = database.collection('LawSearchDescription');
 
-    try {
-      const database = client.db('LawMachine');
-      const LawContent = database.collection('LawSearchDescription');
+    const keywords = req.body.input
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
 
-      LawContent.find({
-        $or: [
-          {_id: new RegExp(`${req.body.input}`, 'i')},
-          {'info.lawDescription': new RegExp(`${req.body.input.replace(/\s/img,'\\,?\\s\\,?').replace(/\\s/img,'\.')}`, 'i')},
-          {'info.lawNameDisplay': new RegExp(`${req.body.input.replace(/\s/img,'\\,?\\s\\,?').replace(/\\s/img,'\.')}`, 'i')},
-        ],
-      })
-        .project({info: 1})
-        .sort({'info.lawDaySign': -1})
-        .toArray()
-        .then(o => res.json(o));
-    } finally {
-    }
-  }
-});
+    const regexConditions = keywords.map(word => ({
+      $or: [
+        { _id: new RegExp(word, 'i') },
+        { 'info.lawDescription': new RegExp(word, 'i') },
+        { 'info.lawNameDisplay': new RegExp(word, 'i') },
+      ]
+    }));
+
+    LawContent.find({
+      $and: regexConditions
+    })
+      .project({ info: 1 })
+      .sort({ 'info.lawDaySign': -1 })
+      .toArray()
+      .then(o => res.json(o));
+
+  } finally {}
+}});
 
 
  export const countAllLaw = onRequest(async (req, res) => {
