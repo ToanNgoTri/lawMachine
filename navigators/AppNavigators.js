@@ -147,7 +147,7 @@ const AppNavigators = () => {
             >
               <Animated.View
                 style={{
-                  top:Platform.OS === 'ios' ? -5 : -insets.bottom/2 - insets.bottom/20,
+                  top:Platform.OS === 'ios' ? -5 : -insets.bottom/24*10 -2,
                   alignItems: 'center',
                   minWidth: 100,
                   display: 'flex',
@@ -245,7 +245,7 @@ const AppNavigators = () => {
 
               <Animated.View
                 style={{
-                  top:Platform.OS === 'ios' ? -5 : -insets.bottom/2 - insets.bottom/20,
+                  top:Platform.OS === 'ios' ? -5 : -insets.bottom/24*10 -2,
                   alignItems: 'center',
                   minWidth: 100,
                   display: 'flex',
@@ -344,7 +344,7 @@ const AppNavigators = () => {
 
               <Animated.View
                 style={{
-                  top:Platform.OS === 'ios' ? -5 : -insets.bottom/2 - insets.bottom/20,
+                  top:Platform.OS === 'ios' ? -5 : -insets.bottom/24*10 -2,
                   alignItems: 'center',
                   minWidth: 100,
                   display: 'flex',

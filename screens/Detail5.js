@@ -603,7 +603,7 @@ function setPositionYArtical({ y, key3 }) {
 
   let transY = animatedForNavi.interpolate({
     inputRange: [-100, 0, 80, 90, 100],
-    outputRange: [0, 0, Platform.OS === 'ios' ? -25 - insets.bottom : -35 - insets.bottom, 0, 0],
+    outputRange: [0, 0, Platform.OS === 'ios' ? -25 - insets.bottom : -45 - insets.bottom, 0, 0],
   });
 
   let transX = animatedForNavi.interpolate({
