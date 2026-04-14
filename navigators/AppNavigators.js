@@ -130,13 +130,13 @@ const AppNavigators = () => {
             <View
               style={{
                 flexDirection: 'row',
-                bottom: Platform.OS === 'ios' ? 0 : 0,
+                bottom: Platform.OS === 'ios' ? 0 : -5,
                 position: 'absolute',
                 backgroundColor: 'white',
                 width: '100%',
                 justifyContent: 'space-around',
                 alignItems: 'center',
-                height: Platform.OS === 'ios' ? 65 : 50 ,
+                height: Platform.OS === 'ios' ? 65 : 50 +insets.bottom-2,
                 borderTopRightRadius: 15,
                 borderTopLeftRadius: 15,
                 display: 'flex',
@@ -147,7 +147,7 @@ const AppNavigators = () => {
             >
               <Animated.View
                 style={{
-                  top:Platform.OS === 'ios' ? -5 : 0,
+                  top:Platform.OS === 'ios' ? -5 : -insets.bottom/2 - insets.bottom/20,
                   alignItems: 'center',
                   minWidth: 100,
                   display: 'flex',
@@ -245,7 +245,7 @@ const AppNavigators = () => {
 
               <Animated.View
                 style={{
-                                    top:Platform.OS === 'ios' ? -5 : 0,
+                  top:Platform.OS === 'ios' ? -5 : -insets.bottom/2 - insets.bottom/20,
                   alignItems: 'center',
                   minWidth: 100,
                   display: 'flex',
@@ -344,7 +344,7 @@ const AppNavigators = () => {
 
               <Animated.View
                 style={{
-                  top:Platform.OS === 'ios' ? -5 : 0,
+                  top:Platform.OS === 'ios' ? -5 : -insets.bottom/2 - insets.bottom/20,
                   alignItems: 'center',
                   minWidth: 100,
                   display: 'flex',
