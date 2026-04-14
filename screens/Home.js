@@ -351,7 +351,7 @@ export default function Home({}) {
         <View
         style={{
           // flex: 1,
-          paddingBottom:Platform.OS === 'ios' ? 0 : insets.bottom/2-7
+          paddingBottom:Platform.OS === 'ios' ? 67 : insets.bottom/2 - 50 -5 + insets.bottom,
         }}>
           <DraggableFlatList
             ref={ScrollViewToScroll}

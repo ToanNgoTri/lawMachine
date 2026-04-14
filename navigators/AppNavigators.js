@@ -136,7 +136,7 @@ const AppNavigators = () => {
                 width: '100%',
                 justifyContent: 'space-around',
                 alignItems: 'center',
-                height: Platform.OS === 'ios' ? 67 : 50 +insets.bottom-2,
+                height: Platform.OS === 'ios' ? 67 : 48 +insets.bottom,
                 borderTopRightRadius: 15,
                 borderTopLeftRadius: 15,
                 display: 'flex',

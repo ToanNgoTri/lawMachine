@@ -1136,7 +1136,7 @@ function setPositionYArtical({ y, key3 }) {
                     ...styles.listArticle,
                     width: (widthDevice / 100) * 60,
                     transform: [{ translateX: transX }],
-                    marginBottom: 40 + insets.bottom / 2,
+                    marginBottom: 35 + insets.bottom ,
                     marginTop: insets.top + 50,
                   }}
                 >
@@ -1242,8 +1242,8 @@ function setPositionYArtical({ y, key3 }) {
           <View
             style={{
               ...styles.functionTab,
-              paddingBottom: 3 + insets.bottom / 2,
-              height: 40 + insets.bottom / 2,
+              paddingBottom: 3 + insets.bottom ,
+              height: 35 + insets.bottom ,
               // bottom:-(insets.bottom + insets.top),
             }}
           >
