@@ -644,7 +644,7 @@ export function Detail1({}) {
           </TouchableOpacity>
         </View>
       </View>
-      <View style={{ marginTop: 0, flex: 1, backgroundColor: '#EEEFE4' ,          paddingBottom:Platform.OS === 'ios' ? 67 : insets.bottom/2 - 50 -5 + insets.bottom,
+      <View style={{ marginTop: 0, flex: 1, backgroundColor: '#EEEFE4' ,          paddingBottom:Platform.OS === 'ios' ? 0 : insets.bottom/2 - 50 -5 + insets.bottom,
 }}>
         {loading1 && (
           <TouchableOpacity
