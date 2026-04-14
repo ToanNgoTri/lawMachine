@@ -15,6 +15,7 @@ import {
   ActivityIndicator,
   Pressable,
   Vibration,
+  Platform,
 } from 'react-native';
 import { Dirs, FileSystem } from 'react-native-file-access';
 import React, { useState, useEffect, useRef } from 'react';
@@ -602,7 +603,7 @@ function setPositionYArtical({ y, key3 }) {
 
   let transY = animatedForNavi.interpolate({
     inputRange: [-100, 0, 80, 90, 100],
-    outputRange: [0, 0, -45 - insets.bottom , 0, 0],
+    outputRange: [0, 0, Platform.OS === 'ios' ? -25 - insets.bottom : -35 - insets.bottom, 0, 0],
   });
 
   let transX = animatedForNavi.interpolate({
@@ -937,7 +938,7 @@ function setPositionYArtical({ y, key3 }) {
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior="padding"
-        keyboardVerticalOffset={-insets.bottom  - 35}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? -insets.bottom - 15 : -insets.bottom - 35}
       >
         <View style={{ flex: 1, position: 'relative' }}>
           <View
@@ -1136,7 +1137,7 @@ function setPositionYArtical({ y, key3 }) {
                     ...styles.listArticle,
                     width: (widthDevice / 100) * 60,
                     transform: [{ translateX: transX }],
-                    marginBottom: 35 + insets.bottom ,
+                    marginBottom: Platform.OS === 'ios' ? 15 + insets.bottom : 35 + insets.bottom,
                     marginTop: insets.top + 50,
                   }}
                 >
@@ -1242,8 +1243,8 @@ function setPositionYArtical({ y, key3 }) {
           <View
             style={{
               ...styles.functionTab,
-              paddingBottom: 3 + insets.bottom ,
-              height: 35 + insets.bottom ,
+              paddingBottom:  Platform.OS === 'ios' ? insets.bottom /2 : 3 +insets.bottom,
+              height: Platform.OS === 'ios' ? 15 + insets.bottom : 35 + insets.bottom ,
               bottom:0 ,
             }}
           >
