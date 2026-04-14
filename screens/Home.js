@@ -7,6 +7,7 @@ import {
   Keyboard,
   Animated,
   TouchableWithoutFeedback,
+  Platform,
 } from 'react-native';
 import { useState, useEffect, useRef, useContext } from 'react';
 import { RefOfHome,
@@ -347,7 +348,11 @@ export default function Home({}) {
       ) : !data.length ? (
         <NoneOfResult />
       ) : (
-        <View>
+        <View
+        style={{
+          // flex: 1,
+          paddingBottom:Platform.OS === 'ios' ? 0 : insets.bottom/2-7
+        }}>
           <DraggableFlatList
             ref={ScrollViewToScroll}
             onScrollBeginDrag={() => Keyboard.dismiss()}

@@ -11,6 +11,7 @@ import {
   FlatList,
   Easing,
   TouchableWithoutFeedback,
+  Platform
 } from 'react-native';
 import CheckBox from 'react-native-check-box';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -643,7 +644,7 @@ export function Detail1({}) {
           </TouchableOpacity>
         </View>
       </View>
-      <View style={{ marginTop: 0, flex: 1, backgroundColor: '#EEEFE4' }}>
+      <View style={{ marginTop: 0, flex: 1, backgroundColor: '#EEEFE4' ,paddingBottom:Platform.OS === 'ios' ? 0 : insets.bottom/2-7}}>
         {loading1 && (
           <TouchableOpacity
             style={{
