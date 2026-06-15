@@ -11,7 +11,7 @@ import {
   FlatList,
   Easing,
   TouchableWithoutFeedback,
-  Platform
+  Platform,
 } from 'react-native';
 import CheckBox from 'react-native-check-box';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -20,6 +20,8 @@ import { useNetInfo } from '@react-native-community/netinfo';
 import React, { useEffect, useState, useRef, memo, useCallback } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTabBarHeight } from '../hooks/useTabBarHeight';
+import { ScreenToggle } from './components/ScreenToggle';
 
 export function Detail1({}) {
   const [SearchResult, setSearchResult] = useState([]); // đây Object là các luật, điểm, khoản có kết quả tìm kiếm
@@ -51,6 +53,8 @@ export function Detail1({}) {
   const textInputFilter = useRef(null);
 
   const FlatListToScroll = useRef(null);
+
+  const tabBarHeight = useTabBarHeight();
 
   const insets = useSafeAreaInsets(); // lất chiều cao để manu top iphone
 
@@ -257,11 +261,7 @@ export function Detail1({}) {
   };
 
   const renderItem = useCallback(
-    data => (
-      <Item
-        id={data}
-      />
-    ),
+    data => <Item id={data} />,
     [SearchResult, input],
   );
 
@@ -424,6 +424,8 @@ export function Detail1({}) {
           borderBottomColor: 'white',
         }}
       >
+        <ScreenToggle active="search" />
+
         <View style={{ ...styles.inputContainer, height: 52, top: 5 }}>
           <View style={{ ...styles.containerBtb, paddingTop: 5 }}>
             <TouchableOpacity
@@ -543,15 +545,14 @@ export function Detail1({}) {
           </View>
           <View style={styles.containerBtb}>
             <TouchableOpacity
-            disabled={loading1}
+              disabled={loading1}
               style={{
                 ...styles.inputBtb,
                 borderRadius: 100,
                 height: 40,
                 borderWidth: 2,
-                borderColor: "#f67c1a",
+                borderColor: '#f67c1a',
                 minWidth: 40,
-
               }}
               onPress={() => {
                 pressToSearch();
@@ -644,8 +645,17 @@ export function Detail1({}) {
           </TouchableOpacity>
         </View>
       </View>
-      <View style={{ marginTop: 0, flex: 1, backgroundColor: '#EEEFE4' ,          paddingBottom:Platform.OS === 'ios' ? 0 : insets.bottom/2 - 50 -5 + insets.bottom,
-}}>
+      <View
+        style={{
+          marginTop: 0,
+          flex: 1,
+          backgroundColor: '#EEEFE4',
+          paddingBottom:
+            Platform.OS === 'ios'
+              ? 0
+              : insets.bottom / 2 - 50 - 5 + insets.bottom,
+        }}
+      >
         {loading1 && (
           <TouchableOpacity
             style={{
@@ -703,14 +713,10 @@ export function Detail1({}) {
               paper < Math.ceil(Object.keys(LawFilted).length / 30) ? (
                 <>
                   <ActivityIndicator color="black" />
-                  <View
-                    style={{ height: 50 + insets.bottom / 2, width: 10 }}
-                  ></View>
+                  <View style={{ height: tabBarHeight }}></View>
                 </>
               ) : (
-                <View
-                  style={{ height: 50 + insets.bottom / 2, width: 10 }}
-                ></View>
+                <View style={{ height: tabBarHeight }}></View>
               )
             }
           />

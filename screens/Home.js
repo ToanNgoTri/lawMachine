@@ -10,9 +10,10 @@ import {
   Platform,
 } from 'react-native';
 import { useState, useEffect, useRef, useContext } from 'react';
-import { RefOfHome,
+import {
+  RefOfHome,
   // BoxInHomeScreen
- } from '../App';
+} from '../App';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Dirs, FileSystem } from 'react-native-file-access';
 // import {useScrollToTop} from '@react-navigation/native';
@@ -22,18 +23,19 @@ import DraggableFlatList, {
   ScaleDecorator,
 } from 'react-native-draggable-flatlist';
 import VersionCheck from 'react-native-version-check';
+import { useTabBarHeight } from '../hooks/useTabBarHeight';
 
 export default function Home({}) {
   const navigation = useNavigation();
 
   const [Info, setInfo] = useState(false);
 
-  
   const [inputSearchLaw, setInputSearchLaw] = useState('');
   const [showBackground, setShowBackground] = useState(false);
   const [textInputFocus, setTextInputFocus] = useState(false);
 
   const insets = useSafeAreaInsets(); // lất chiều cao để menu top iphone
+  const tabBarHeight = useTabBarHeight();
 
   const ScrollViewToScroll = useRef(null);
   const textInput = useRef(null);
@@ -214,7 +216,6 @@ export default function Home({}) {
     // checkForUpdate();
   }, []);
 
-
   const [data, setData] = useState([]);
 
   async function sortedData(data) {
@@ -226,7 +227,6 @@ export default function Home({}) {
 
     // console.log('new data',data );
   }
-
 
   function NoneOfResult() {
     return (
@@ -348,11 +348,7 @@ export default function Home({}) {
       ) : !data.length ? (
         <NoneOfResult />
       ) : (
-        <View
-        style={{
-          // flex: 1,
-          paddingBottom:Platform.OS === 'ios' ? 0 : insets.bottom/2 - 50 -5 + insets.bottom,
-        }}>
+        <View style={{ flex: 1 }}>
           <DraggableFlatList
             ref={ScrollViewToScroll}
             onScrollBeginDrag={() => Keyboard.dismiss()}
@@ -367,7 +363,7 @@ export default function Home({}) {
             ListFooterComponent={() => (
               <View
                 style={{
-                  height: 94 + insets.bottom / 2 + insets.top,
+                  height: tabBarHeight-6,
                   width: '100%',
                 }}
               ></View>
@@ -375,7 +371,6 @@ export default function Home({}) {
           />
         </View>
       )}
-
     </>
   );
 }

@@ -11,9 +11,9 @@ import {
   FlatList,
   Easing,
   TouchableWithoutFeedback,
-  Platform
+  Platform,
 } from 'react-native';
-// import {handle2, searchLaw} from '../redux/fetchData';
+import { ScreenToggle } from './components/ScreenToggle';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
@@ -22,6 +22,7 @@ import { useNetInfo } from '@react-native-community/netinfo';
 import CheckBox from 'react-native-check-box';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Dirs, FileSystem } from 'react-native-file-access';
+import { useTabBarHeight } from '../hooks/useTabBarHeight';
 
 export function Detail2({}) {
   const { loading5, info5 } = useSelector(
@@ -39,14 +40,12 @@ export function Detail2({}) {
 
   const [paper, setPaper] = useState(0);
 
-  
-  
   const [SearchResult, setSearchResult] = useState(
     // info3 ? convertResult(info3.slice(0, 10)) : [],
     [],
   ); // đây Object là các luật, điểm, khoản có kết quả tìm kiếm
   // console.log('info3',info3);
-  
+
   // console.log('SearchResult', SearchResult);
   const [inputFilter, setInputFilter] = useState('');
   const [showFilter, setShowFilter] = useState(false);
@@ -69,13 +68,13 @@ export function Detail2({}) {
   const navigation = useNavigation();
 
   const insets = useSafeAreaInsets(); // lất chiều cao để manu top iphone
+  const tabBarHeight = useTabBarHeight();
 
   const textInput = useRef(null);
   const textInputFilter = useRef(null);
   // const textInputForFilter = useRef(null);
 
   const FlatListToScroll = useRef(null);
-
 
   const dispatch = useDispatch();
 
@@ -93,11 +92,12 @@ export function Detail2({}) {
 
   function LawFilterContent(choosenLaw, SearchResult) {
     let contentFilted = {};
-    SearchResult &&  Object.keys(SearchResult).filter(key => {
-      if (choosenLaw.includes(key)) {
-        contentFilted[key] = SearchResult[key];
-      }
-    });
+    SearchResult &&
+      Object.keys(SearchResult).filter(key => {
+        if (choosenLaw.includes(key)) {
+          contentFilted[key] = SearchResult[key];
+        }
+      });
     setLawFilted(contentFilted);
     // console.log('LawFilted',LawFilted);
   }
@@ -121,82 +121,80 @@ export function Detail2({}) {
     }
   }, [info3]);
 
-function highlight(para, word, i2) {
-  if (!para || !word) {
-    return (
-      <Text>
-        {'   '}
-        {para}
-      </Text>
-    );
-  }
-
-  const keywords = word
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean)
-    .map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')); // escape regex
-
-  if (!keywords.length) {
-    return (
-      <Text>
-        {'   '}
-        {para}
-      </Text>
-    );
-  }
-
-  // tạo regex dạng: (trộm|cắp|tài|sản)
-  const regex = new RegExp(`(${keywords.join('|')})`, 'giu');
-
-  const parts = para.split(regex);
-
-  const result = parts.map((part, index) => {
-    const isMatch = regex.test(part);
-
-    // reset regex vì test() với flag g sẽ bị lệch index
-    regex.lastIndex = 0;
-
-    if (isMatch) {
+  function highlight(para, word, i2) {
+    if (!para || !word) {
       return (
-        <Text
-          key={index}
-          style={
-            i2.match(/aa/)
-              ? { ...styles.chapterText, backgroundColor: 'yellow' }
-              : { backgroundColor: 'yellow' }
-          }
-        >
-          {part}
+        <Text>
+          {'   '}
+          {para}
         </Text>
       );
     }
 
-    return (
-      <Text
-        key={index}
-        style={i2.match(/aa/) ? { ...styles.chapterText } : {}}
-      >
-        {part}
-      </Text>
-    );
-  });
+    const keywords = word
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')); // escape regex
 
-  return (
-    <View>
-      <Text
-        style={
-          i2.match(/aa/)
-            ? { textAlign: 'center' }
-            : { textAlign: 'justify' }
-        }
-      >
-        {'   '}
-        {result}
-      </Text>
-    </View>
-  );
-}
+    if (!keywords.length) {
+      return (
+        <Text>
+          {'   '}
+          {para}
+        </Text>
+      );
+    }
+
+    // tạo regex dạng: (trộm|cắp|tài|sản)
+    const regex = new RegExp(`(${keywords.join('|')})`, 'giu');
+
+    const parts = para.split(regex);
+
+    const result = parts.map((part, index) => {
+      const isMatch = regex.test(part);
+
+      // reset regex vì test() với flag g sẽ bị lệch index
+      regex.lastIndex = 0;
+
+      if (isMatch) {
+        return (
+          <Text
+            key={index}
+            style={
+              i2.match(/aa/)
+                ? { ...styles.chapterText, backgroundColor: 'yellow' }
+                : { backgroundColor: 'yellow' }
+            }
+          >
+            {part}
+          </Text>
+        );
+      }
+
+      return (
+        <Text
+          key={index}
+          style={i2.match(/aa/) ? { ...styles.chapterText } : {}}
+        >
+          {part}
+        </Text>
+      );
+    });
+
+    return (
+      <View>
+        <Text
+          style={
+            i2.match(/aa/) ? { textAlign: 'center' } : { textAlign: 'justify' }
+          }
+        >
+          {'   '}
+          {result}
+        </Text>
+      </View>
+    );
+  }
   function convertResult(info) {
     let lawObject = {};
     info.map((law, i) => {
@@ -231,7 +229,9 @@ function highlight(para, word, i2) {
 
   useEffect(() => {
     setChoosenLaw(
-      SearchResult &&Object.keys(SearchResult).length ? Object.keys(SearchResult) : [],
+      SearchResult && Object.keys(SearchResult).length
+        ? Object.keys(SearchResult)
+        : [],
     );
   }, [SearchResult]);
 
@@ -289,7 +289,6 @@ function highlight(para, word, i2) {
         dispatch({ type: 'getlastedlaws' });
       }
     } else {
-
       dispatch({ type: 'getlastedlaws' });
     }
   }
@@ -348,7 +347,8 @@ function highlight(para, word, i2) {
 
     if (
       // choosenKindLaw.length &&
-      SearchResult && Object.keys(SearchResult).length &&
+      SearchResult &&
+      Object.keys(SearchResult).length &&
       SearchResult['_id'] !== 'none'
     ) {
       Object.keys(SearchResult).map((law, i) => {
@@ -450,7 +450,6 @@ function highlight(para, word, i2) {
   const Item = memo(title => {
     let detailId = title.id.item;
     let i = title.id.index;
-
 
     const dateLawDaySign = new Date(SearchResult[detailId]['lawDaySign']);
 
@@ -602,6 +601,8 @@ function highlight(para, word, i2) {
           borderBottomColor: 'black',
         }}
       >
+                         <ScreenToggle active="searchlaw" />
+
         <View style={{ ...styles.inputContainer, height: 52, top: 5 }}>
           <View style={{ ...styles.containerBtb, paddingTop: 5 }}>
             <TouchableOpacity
@@ -735,7 +736,6 @@ function highlight(para, word, i2) {
             <TouchableOpacity
               disabled={loading5}
               style={{
-                
                 ...styles.inputBtb,
                 borderRadius: 100,
                 height: 40,
@@ -835,10 +835,16 @@ function highlight(para, word, i2) {
             ></Ionicons>
           </TouchableOpacity>
         </View>
+
       </View>
 
-      <View style={{ marginTop: 0, flex: 1, backgroundColor: '#EEEFE4' ,          paddingBottom:Platform.OS === 'ios' ? 0 : insets.bottom/2 - 50 -5 + insets.bottom,
-}}>
+      <View
+        style={{
+          marginTop: 0,
+          flex: 1,
+          backgroundColor: '#EEEFE4',
+        }}
+      >
         {loading5 && (
           <TouchableOpacity
             style={{
@@ -894,7 +900,6 @@ function highlight(para, word, i2) {
                 justifyContent: 'center',
               }}
             >
-
               <Text
                 style={{
                   color: 'white',
@@ -912,7 +917,7 @@ function highlight(para, word, i2) {
           </View>
         )}
 
-        { (info5 != null && info5.length == 0 )|| !SearchResult ? (
+        {(info5 != null && info5.length == 0) || !SearchResult ? (
           <NoneOfResutl style={{ backgroundColor: 'red' }} />
         ) : Object.keys(SearchResult).length || info3.length || info5 ? (
           <FlatList
@@ -933,12 +938,18 @@ function highlight(para, word, i2) {
                 <>
                   <ActivityIndicator color="black" />
                   <View
-                    style={{ height: 50 + insets.bottom / 2, width: 10 }}
+                    style={{
+                      height: tabBarHeight,
+                      width: 10,
+                    }}
                   ></View>
                 </>
               ) : (
                 <View
-                  style={{ height: 50 + insets.bottom / 2, width: 10 }}
+                  style={{
+                    height: tabBarHeight,
+                    width: 10,
+                  }}
                 ></View>
               )
             }
@@ -1132,7 +1143,7 @@ function highlight(para, word, i2) {
                   // flexDirection:'row'
                 }}
               >
-                {SearchResult && 
+                {SearchResult &&
                   Object.keys(SearchResult).map((key, i) => {
                     // console.log('key', key);
                     // console.log('SearchResult',SearchResult);
@@ -1175,8 +1186,12 @@ function highlight(para, word, i2) {
                       );
                     }
                     if (
-                      (nameLaw && nameLaw.match(new RegExp(inputSearchLawReg, 'igm'))) ||
-                     (lawDescription && lawDescription.match(new RegExp(inputSearchLawReg, 'igm')))
+                      (nameLaw &&
+                        nameLaw.match(new RegExp(inputSearchLawReg, 'igm'))) ||
+                      (lawDescription &&
+                        lawDescription.match(
+                          new RegExp(inputSearchLawReg, 'igm'),
+                        ))
                     ) {
                       return (
                         <TouchableOpacity

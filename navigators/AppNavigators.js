@@ -1,20 +1,15 @@
 import { NavigationContainer } from '@react-navigation/native';
-// import {TouchableOpacity} from 'react-native-gesture-handler'
 import { useSelector, useDispatch } from 'react-redux';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-// import database from '@react-native-firebase/database';
 import { useEffect, useContext, useRef, useState } from 'react';
 import Home from '../screens/Home';
 import { Detail1 } from '../screens/Detail1';
 import { Detail2 } from '../screens/Detail2';
-// import Detail4 from '../screens/Detail4';
+import { AIChatScreen } from '../screens/chatAI';
 import { Detail5 } from '../screens/Detail5';
 import { useNetInfo } from '@react-native-community/netinfo';
-import {
-  RefOfHome,
-  // BoxInHomeScreen
-} from '../App';
+import { RefOfHome } from '../App';
 import {
   Text,
   View,
@@ -27,481 +22,268 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
+// ─────────────────────────────────────────────────────────────
+// SearchStack
+// ─────────────────────────────────────────────────────────────
+const SearchStackNav = createNativeStackNavigator();
+
+function SearchStack() {
+  return (
+    <SearchStackNav.Navigator
+      screenOptions={{
+        headerShown: false,
+        animation: 'none',
+      }}
+    >
+      <SearchStackNav.Screen name="SearchLaw" component={Detail2} />
+      <SearchStackNav.Screen name="Search" component={Detail1} />
+    </SearchStackNav.Navigator>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Tab Navigator
+// Tab index: 0=Home  1=SearchStack  2=AIChat
+// ─────────────────────────────────────────────────────────────
 const Tab = createMaterialTopTabNavigator();
 
+const TAB_CONFIGS = [
+  {
+    name: 'Home',
+    label: 'Đã tải xuống',
+    iconActive: 'home',
+    iconInactive: 'home-outline',
+    component: null, // set below
+  },
+  {
+    name: 'SearchStack',
+    label: 'Tìm kiếm',
+    iconActive: 'search',
+    iconInactive: 'search-outline',
+    component: null,
+  },
+  {
+    name: 'AIChat',
+    label: 'Chat AI',
+    iconActive: 'sparkles',
+    iconInactive: 'sparkles-outline',
+    component: null,
+  },
+];
+
 const AppNavigators = () => {
-  const insets = useSafeAreaInsets(); // lất chiều cao để manu top iphone
+  const insets = useSafeAreaInsets();
   const HomeScreen = useContext(RefOfHome);
 
-  const { width, height } = Dimensions.get('window');
+  const { width } = Dimensions.get('window');
   const [widthDevice, setWidthDevice] = useState(width);
-  Dimensions.addEventListener('change', ({ window: { width, height } }) => {
-    heightDevice = height;
-    setWidthDevice(width);
-  });
 
-  // const [lastedScreenIndex, setLastedScreenIndex] = useState(0);
+  useEffect(() => {
+    const sub = Dimensions.addEventListener('change', ({ window: { width: w } }) => {
+      setWidthDevice(w);
+    });
+    return () => sub?.remove();
+  }, []);
 
-  const animatedForHomeTab = useRef(new Animated.Value(60)).current;
+  const tabTop    = Platform.OS === 'ios' ? -5 : (-insets.bottom / 24) * 10 - 2;
+  const tabHeight = Platform.OS === 'ios' ? 67 : 48 + insets.bottom;
+  const tabWidth  = widthDevice / 3 - 30;
 
-  let homeTabRibbon = animatedForHomeTab.interpolate({
-    inputRange: [0, 60],
-    outputRange: [0, 70],
-  });
+  // ── TabItem dùng position trực tiếp ──────────────────────────
+  // Native Animated chỉ hỗ trợ: opacity, transform (scale/translate/rotate)
+  // KHÔNG hỗ trợ: width, height, backgroundColor → dùng scaleX thay width
+  const TabItem = ({ tabIndex, label, iconActive, iconInactive, onPress, position, currentIdx }) => {
+    const i = tabIndex;
 
-  let homeTabTitleHeight = animatedForHomeTab.interpolate({
-    inputRange: [0, 60],
-    outputRange: [1, 0],
-  });
+    // scaleX: 0→1 thay vì width: 0→70 (ribbon cố định width=70, scale từ 0)
+    const ribbonScaleX = position.interpolate({
+      inputRange: [i - 1, i, i + 1],
+      outputRange: [0, 1, 0],
+      extrapolate: 'clamp',
+    });
+    const iconScale = position.interpolate({
+      inputRange: [i - 1, i, i + 1],
+      outputRange: [1, 1.2, 1],
+      extrapolate: 'clamp',
+    });
+    const isActive = currentIdx === tabIndex;
 
-  let homeTabIconSize = animatedForHomeTab.interpolate({
-    inputRange: [0, 60],
-    outputRange: [1, 1.2],
-  });
+    // translateY: đẩy label xuống dưới khi active thay vì scale (scale vẫn chiếm height)
+    const labelTranslateY = position.interpolate({
+      inputRange: [i - 1, i, i + 1],
+      outputRange: [0, 20, 0],
+      extrapolate: 'clamp',
+    });
+    const labelOpacity = position.interpolate({
+      inputRange: [i - 1, i, i + 1],
+      outputRange: [1, 0, 1],
+      extrapolate: 'clamp',
+    });
 
-  const animatedForSearchLaw = useRef(new Animated.Value(0)).current;
+    // translateY cho toàn bộ content: inactive thì nhích lên, active thì về 0
+    const contentTranslateY = position.interpolate({
+      inputRange: [i - 1, i, i + 1],
+      outputRange: [-insets.bottom/3 , -insets.bottom/3 +5, -insets.bottom/3],
+      extrapolate: 'clamp',
+    });
 
-  let searchLawRibbon = animatedForSearchLaw.interpolate({
-    inputRange: [0, 60],
-    outputRange: [0, 70],
-  });
+    return (
+      <View
+        style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: tabHeight,
+          width: tabWidth,
+          overflow: 'hidden',
+        }}
+      >
+        <TouchableOpacity
+          style={{
+            width: tabWidth,
+            height: tabHeight,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          onPress={onPress}
+        >
+          <Animated.View
+            style={{
+              alignItems: 'center',
+              transform: [{ translateY: contentTranslateY }],
+            }}
+          >
+            {/* icon + ribbon */}
+            <Animated.View style={{ alignItems: 'center', transform: [{ scale: iconScale }] }}>
+              <Animated.View
+                style={{
+                  width: 70,
+                  height: 29,
+                  borderRadius: 10,
+                  backgroundColor: '#996600',
+                  position: 'absolute',
+                  alignSelf: 'center',
+                  transform: [{ scaleX: ribbonScaleX }],
+                }}
+              />
+              <Ionicons
+                name={isActive ? iconActive : iconInactive}
+                style={isActive ? styles.IconActive : styles.IconInActive}
+              />
+            </Animated.View>
 
-  let searchLawTabTitleHeight = animatedForSearchLaw.interpolate({
-    inputRange: [0, 60],
-    outputRange: [1, 0],
-  });
-
-  let searchLawTabIconSize = animatedForSearchLaw.interpolate({
-    inputRange: [0, 60],
-    outputRange: [1, 1.2],
-  });
-
-  const animatedForSearchContent = useRef(new Animated.Value(0)).current;
-
-  let searchContentRibbon = animatedForSearchContent.interpolate({
-    inputRange: [0, 60],
-    outputRange: [0, 70],
-  });
-
-  let searchContentTabTitleHeight = animatedForSearchContent.interpolate({
-    inputRange: [0, 60],
-    outputRange: [1, 0],
-  });
-
-  let searchContentTabIconSize = animatedForSearchContent.interpolate({
-    inputRange: [0, 60],
-    outputRange: [1, 1.2],
-  });
-
-  const animated = useRef(new Animated.Value(0)).current;
-
-  let Opacity = animated.interpolate({
-    inputRange: [0, 100],
-    outputRange: [0.5, 0],
-  });
-
+            {/* label — fade + slide khi active */}
+            <Animated.Text
+              style={{
+                color: 'black',
+                fontSize: 11,
+                fontWeight: 'bold',
+                marginTop: 2,
+                opacity: labelOpacity,
+                transform: [{ translateY: labelTranslateY }],
+              }}
+            >
+              {label}
+            </Animated.Text>
+          </Animated.View>
+        </TouchableOpacity>
+      </View>
+    );
+  };
 
   return (
     <View style={{ flex: 1 }}>
       <Tab.Navigator
         backBehavior="none"
-        tabBar={({ navigation, state, descriptors, position }) => {
-          if (
-            state.index == position._a._value &&
-            state.index == 0 &&
-            HomeScreen.homeRef
-          ) {
-            HomeScreen.homeRef.scrollToOffset({ offset: 0 });
-          } else if (
-            state.index == position._a._value &&
-            state.index == 1 &&
-            global.SearchLawRef
-          ) {
-            global.SearchLawRef.scrollToOffset({ offset: 0 });
-          } else if (
-            state.index == position._a._value &&
-            state.index == 2 &&
-            global.SearchContentRef
-          ) {
-            global.SearchContentRef.scrollToOffset({ offset: 0 });
+        tabBar={({ navigation, state, position }) => {
+          const idx = state.index;
+
+          // scroll-to-top khi bấm lại tab đang active
+          if (state.index === Math.round(position._value)) {
+            if (idx === 0 && HomeScreen.homeRef)
+              HomeScreen.homeRef.scrollToOffset({ offset: 0 });
+            if (idx === 1 && global.SearchLawRef)
+              global.SearchLawRef.scrollToOffset({ offset: 0 });
+            if (idx === 2 && global.SearchContentRef)
+              global.SearchContentRef.scrollToOffset({ offset: 0 });
           }
-          
+
           return (
             <View
               style={{
                 flexDirection: 'row',
                 bottom: Platform.OS === 'ios' ? 0 : -5,
                 position: 'absolute',
-                backgroundColor: 'white',
                 width: '100%',
-                justifyContent: 'space-around',
-                alignItems: 'center',
-                height: Platform.OS === 'ios' ? 67 : 48 +insets.bottom,
+                justifyContent: 'space-evenly',
+                alignItems: 'stretch',
+                height: tabHeight,
                 borderTopRightRadius: 15,
                 borderTopLeftRadius: 15,
-                display: 'flex',
                 backgroundColor: '#F8BD2D',
-                alignContent: 'center',
                 overflow: 'hidden',
               }}
             >
-              <Animated.View
-                style={{
-                  top:Platform.OS === 'ios' ? -5 : -insets.bottom/24*10 -2,
-                  alignItems: 'center',
-                  minWidth: 100,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  overflow: 'hidden',
-                  justifyContent: 'center',
-                  position: 'relative',
-                  height: 44,
-                  transform: [{ scale: homeTabIconSize }, { translateX: 7 }],
-                }}
-              >
-                <TouchableOpacity
-                  style={{
-                    width: widthDevice / 3,
-                    height: 100,
-                    justifyContent: 'center',
-                    display: 'flex',
-                  }}
-                  onPress={() => {
-                    navigation.navigate('Home');
+              <TabItem
+                tabIndex={0}
+                label="Đã tải xuống"
+                iconActive="home"
+                iconInactive="home-outline"
+                position={position}
+                currentIdx={idx}
+                onPress={() => navigation.navigate('Home')}
+              />
 
-                    Animated.timing(animatedForHomeTab, {
-                      toValue: 60,
-                      duration: 300,
-                      useNativeDriver: false,
-                    }).start();
+              <TabItem
+                tabIndex={1}
+                label="Tìm kiếm"
+                iconActive="search"
+                iconInactive="search-outline"
+                position={position}
+                currentIdx={idx}
+                onPress={() => navigation.navigate('SearchStack')}
+              />
 
-                    Animated.timing(animatedForSearchLaw, {
-                      toValue: 0,
-                      duration: 300,
-                      useNativeDriver: false,
-                    }).start();
-
-                    Animated.timing(animatedForSearchContent, {
-                      toValue: 0,
-                      duration: 300,
-                      useNativeDriver: false,
-                    }).start();
-                  }}
-                >
-                  {state.index == 0 ? (
-                    <View
-                      style={{
-                        alignItems: 'center',
-                      }}
-                    >
-                      <Animated.View
-                        style={{
-                          width: homeTabRibbon,
-                          height: 29,
-                          borderRadius: 10,
-                          backgroundColor: '#996600', //rgba(39,64,139,.7)
-                          position: 'absolute',
-                        }}
-                      ></Animated.View>
-                      <Ionicons
-                        name="home"
-                        style={styles.IconActive}
-                      ></Ionicons>
-                    </View>
-                  ) : (
-                    <View
-                      style={{ justifyContent: 'center', alignItems: 'center' }}
-                    >
-                      <Ionicons
-                        name="home-outline"
-                        style={styles.IconInActive}
-                      ></Ionicons>
-                    </View>
-                  )}
-                  <Animated.View
-                    style={{
-                      transform: [{ scale: homeTabTitleHeight }],
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <Text
-                      style={{
-                        ...(state.index == 0
-                          ? styles.TextActive
-                          : styles.TextInActive),
-                        fontSize: 12.5,
-                        fontWeight: 'bold',
-                        display: state.index == 0 ? 'none' : 'flex',
-                        lineHeight: 14,
-                        bottom: -2,
-                      }}
-                    >
-                      Đã tải xuống
-                    </Text>
-                  </Animated.View>
-                </TouchableOpacity>
-              </Animated.View>
-
-              <Animated.View
-                style={{
-                  top:Platform.OS === 'ios' ? -5 : -insets.bottom/24*10 -2,
-                  alignItems: 'center',
-                  minWidth: 100,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  overflow: 'hidden',
-                  justifyContent: 'center',
-                  position: 'relative',
-                  height: 44,
-                  transform: [{ scale: searchLawTabIconSize }],
-                }}
-              >
-                <TouchableOpacity
-                  style={{
-                    width: widthDevice / 3,
-                    height: 100,
-                    justifyContent: 'center',
-                    display: 'flex',
-                  }}
-                  onPress={() => {
-                    navigation.navigate('SearchLaw');
-                    Animated.timing(animatedForHomeTab, {
-                      toValue: 0,
-                      duration: 300,
-                      useNativeDriver: false,
-                    }).start();
-
-                    Animated.timing(animatedForSearchLaw, {
-                      toValue: 60,
-                      duration: 300,
-                      useNativeDriver: false,
-                    }).start();
-
-                    Animated.timing(animatedForSearchContent, {
-                      toValue: 0,
-                      // toValue:100,
-                      duration: 300,
-                      useNativeDriver: false,
-                    }).start();
-                  }}
-                >
-                  {state.index == 1 ? (
-                    <View
-                      style={{
-                        alignItems: 'center',
-                      }}
-                    >
-                      <Animated.View
-                        style={{
-                          width: searchLawRibbon,
-                          height: 29,
-                          borderRadius: 10,
-                          backgroundColor: '#996600',
-                          position: 'absolute',
-                        }}
-                      ></Animated.View>
-
-                      <Ionicons
-                        name="albums"
-                        style={styles.IconActive}
-                      ></Ionicons>
-                    </View>
-                  ) : (
-                    <View
-                      style={{ justifyContent: 'center', alignItems: 'center' }}
-                    >
-                      <Ionicons
-                        name="albums-outline"
-                        style={styles.IconInActive}
-                      ></Ionicons>
-                    </View>
-                  )}
-                  <Animated.View
-                    style={{
-                      padding: 0,
-                      transform: [{ scale: searchLawTabTitleHeight }],
-                      alignItems: 'center',
-                    }}
-                  >
-                    <Text
-                      style={{
-                        ...(state.index == 1
-                          ? styles.TextActive
-                          : styles.TextInActive),
-                        fontSize: 12.5,
-                        fontWeight: 'bold',
-                        display: state.index == 1 ? 'none' : 'flex',
-                        lineHeight: 14,
-                        bottom: -2,
-                      }}
-                    >
-                      Tìm văn bản
-                    </Text>
-                  </Animated.View>
-                </TouchableOpacity>
-              </Animated.View>
-
-              <Animated.View
-                style={{
-                  top:Platform.OS === 'ios' ? -5 : -insets.bottom/24*10 -2,
-                  alignItems: 'center',
-                  minWidth: 100,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  overflow: 'hidden',
-                  justifyContent: 'center',
-                  position: 'relative',
-                  height: 44,
-                  transform: [
-                    { scale: searchContentTabIconSize },
-                    { translateX: -7 },
-                  ],
-                }}
-              >
-                <TouchableOpacity
-                  style={{
-                    width: widthDevice / 3,
-                    height: 100,
-                    // backgroundColor: 'red',
-                    justifyContent: 'center',
-                    display: 'flex',
-                  }}
-                  onPress={() => {
-                    navigation.navigate('Search');
-                    Animated.timing(animatedForHomeTab, {
-                      toValue: 0,
-                      // toValue:100,
-                      duration: 300,
-                      useNativeDriver: false,
-                    }).start();
-
-                    Animated.timing(animatedForSearchLaw, {
-                      toValue: 0,
-                      // toValue:100,
-                      duration: 300,
-                      useNativeDriver: false,
-                    }).start();
-
-                    Animated.timing(animatedForSearchContent, {
-                      toValue: 60,
-                      // toValue:100,
-                      duration: 300,
-                      useNativeDriver: false,
-                    }).start();
-                  }}
-                >
-                  {state.index == 2 ? (
-                    <View
-                      style={{
-                        alignItems: 'center',
-                        // transform: [{translateY: -2}],
-                      }}
-                    >
-                      <Animated.View
-                        style={{
-                          width: searchContentRibbon,
-                          height: 29,
-                          borderRadius: 10,
-                          backgroundColor: '#996600',
-                          position: 'absolute',
-                        }}
-                      ></Animated.View>
-
-                      <Ionicons
-                        name="search"
-                        style={styles.IconActive}
-                      ></Ionicons>
-                    </View>
-                  ) : (
-                    <View
-                      style={{ justifyContent: 'center', alignItems: 'center' }}
-                    >
-                      <Ionicons
-                        name="search-outline"
-                        style={styles.IconInActive}
-                      ></Ionicons>
-                    </View>
-                  )}
-                  <Animated.View
-                    style={{
-                      // height:homeTabTitleHeight,
-                      // backgroundColor:'yellow',
-                      padding: 0,
-                      transform: [{ scale: searchContentTabTitleHeight }],
-                      alignItems: 'center',
-                    }}
-                  >
-                    <Text
-                      style={{
-                        ...(state.index == 2
-                          ? styles.TextActive
-                          : styles.TextInActive),
-                        fontSize: 12.5,
-                        fontWeight: 'bold',
-                        display: state.index == 2 ? 'none' : 'flex',
-                        lineHeight: 14,
-                        bottom: -2,
-                      }}
-                    >
-                      Tìm nội dung
-                    </Text>
-                  </Animated.View>
-                </TouchableOpacity>
-              </Animated.View>
+              <TabItem
+                tabIndex={2}
+                label="Chat AI"
+                iconActive="sparkles"
+                iconInactive="sparkles-outline"
+                position={position}
+                currentIdx={idx}
+                onPress={() => navigation.navigate('AIChat')}
+              />
             </View>
           );
         }}
         tabBarPosition="bottom"
-        screenOptions={({ route }) => ({
+        screenOptions={{
           tabBarPressColor: '#FFCC66',
           animationEnabled: false,
-          animation: 'shift',
-          swipeEnabled: false,
           lazy: false,
-          tabBarIndicatorStyle: {
-            display: 'none',
-          },
-        })}
+          tabBarIndicatorStyle: { display: 'none' },
+        }}
       >
         <Tab.Screen
           name="Home"
           component={Home}
-          options={{
-            header: () => null,
-            tabBarLabel: () => {
-              return null;
-            },
-          }}
-          listeners={{
-            tabPress: props => {},
-          }}
+          options={{ header: () => null, tabBarLabel: () => null }}
         />
-
         <Tab.Screen
-          name="SearchLaw"
-          component={Detail2}
+          name="SearchStack"
+          component={SearchStack}
           options={{
             header: () => null,
-            tabBarLabel: () => {
-              return null;
-            },
-          }}
-          listeners={{
-            tabPress: props => {},
+            tabBarLabel: () => null,
+            swipeEnabled: true,
           }}
         />
         <Tab.Screen
-          name="Search"
-          component={Detail1}
+          name="AIChat"
+          component={AIChatScreen}
           options={{
             header: () => null,
-            tabBarLabel: () => {
-              return null;
-            },
-          }}
-          listeners={{
-            tabPress: props => {},
+            tabBarLabel: () => null,
+            swipeEnabled: true,
           }}
         />
       </Tab.Navigator>
@@ -509,25 +291,20 @@ const AppNavigators = () => {
   );
 };
 
+// ─────────────────────────────────────────────────────────────
+// Root Stack
+// ─────────────────────────────────────────────────────────────
 const Stack = createNativeStackNavigator();
 
 const StackNavigator = () => {
-
   const netInfo = useNetInfo();
-  let internetConnected = netInfo.isConnected;
-
   const dispatch = useDispatch();
-
 
   return (
     <NavigationContainer>
       <Stack.Navigator
         screenOptions={{
-          // headerShadowVisible:true,
-
-          headerStyle: {
-            backgroundColor: 'green',
-          },
+          headerStyle: { backgroundColor: 'green' },
           headerBlurEffect: 'extraLight',
           headerShadowVisible: false,
         }}
@@ -535,38 +312,35 @@ const StackNavigator = () => {
         <Stack.Screen
           name="HomeStack"
           component={AppNavigators}
-          options={{
-            header: () => null,
-          }}
+          options={{ header: () => null }}
         />
-
         <Stack.Screen
-          name={`accessLaw`}
+          name="accessLaw"
           component={Detail5}
-          options={({ navigation }) => ({
+          options={{
             headerTitleAlign: 'center',
             animation: 'simple_push',
             animationTypeForReplace: 'push',
             header: () => null,
-          })}
+          }}
         />
-        {/* ))} */}
+        <Stack.Screen
+          name="SearchContent"
+          component={Detail1}
+          options={{ header: () => null, animation: 'simple_push' }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
 };
 
+// ─────────────────────────────────────────────────────────────
+// Styles
+// ─────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
-  tabItemInactive: {
-    position: 'relative',
-    height: '102%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   IconActive: {
-    fontSize: 26,
-    color: 'white', // #FF3030
+    fontSize: 24,
+    color: 'white',
     padding: 0,
     margin: 0,
     lineHeight: 28,
@@ -577,14 +351,12 @@ const styles = StyleSheet.create({
     padding: 0,
     lineHeight: 23,
   },
-
   TextActive: {
     fontSize: 24,
-    color: 'black', //#FF3030
+    color: 'black',
     padding: 0,
     margin: 0,
     lineHeight: 10,
-
   },
   TextInActive: {
     fontSize: 24,
@@ -592,18 +364,16 @@ const styles = StyleSheet.create({
     padding: 0,
     lineHeight: 10,
   },
-
   IconInfo: {
     fontSize: 30,
-    display: 'flex',
     color: 'white',
   },
   iconInfoContainer: {
     height: 40,
-    display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 25,
   },
 });
+
 export default StackNavigator;
