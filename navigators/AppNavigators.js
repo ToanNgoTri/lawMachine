@@ -1,8 +1,8 @@
 import { NavigationContainer } from '@react-navigation/native';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import { useEffect, useContext, useRef, useState } from 'react';
+import { useEffect, useContext, useRef, useState, useInsertionEffect } from 'react';
 import Home from '../screens/Home';
 import { Detail1 } from '../screens/Detail1';
 import { Detail2 } from '../screens/Detail2';
@@ -11,7 +11,6 @@ import { Detail5 } from '../screens/Detail5';
 import { useNetInfo } from '@react-native-community/netinfo';
 import { RefOfHome } from '../App';
 import {
-  Text,
   View,
   StyleSheet,
   TouchableOpacity,
@@ -26,15 +25,9 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 // SearchStack
 // ─────────────────────────────────────────────────────────────
 const SearchStackNav = createNativeStackNavigator();
-
 function SearchStack() {
   return (
-    <SearchStackNav.Navigator
-      screenOptions={{
-        headerShown: false,
-        animation: 'none',
-      }}
-    >
+    <SearchStackNav.Navigator screenOptions={{ headerShown: false, animation: 'none' }}>
       <SearchStackNav.Screen name="SearchLaw" component={Detail2} />
       <SearchStackNav.Screen name="Search" component={Detail1} />
     </SearchStackNav.Navigator>
@@ -42,225 +35,176 @@ function SearchStack() {
 }
 
 // ─────────────────────────────────────────────────────────────
+// Tab config
+// ─────────────────────────────────────────────────────────────
+const TAB_ITEMS = [
+  { name: 'Home',        label: 'Đã tải xuống', iconActive: 'home',     iconInactive: 'home-outline'     },
+  { name: 'SearchStack', label: 'Tìm kiếm',     iconActive: 'search',   iconInactive: 'search-outline'   },
+  { name: 'AIChat',      label: 'Chat AI',       iconActive: 'sparkles', iconInactive: 'sparkles-outline' },
+];
+
+// ─────────────────────────────────────────────────────────────
+// TabItem
+// ─────────────────────────────────────────────────────────────
+function TabItem({ tabIndex, currentIdx, label, iconActive, iconInactive, onPress, tabWidth, tabHeight, anim }) {
+  const isActive = currentIdx === tabIndex;
+  const insets = useSafeAreaInsets();
+  const ribbonScaleX = anim.interpolate({ inputRange: [0, 1], outputRange: [0, 1], extrapolate: 'clamp' });
+  const iconScale    = anim.interpolate({ inputRange: [0, 1], outputRange: [1, 1.2], extrapolate: 'clamp' });
+  const labelOpacity = anim.interpolate({ inputRange: [0, 1], outputRange: [1, 0], extrapolate: 'clamp' });
+  const labelScale   = anim.interpolate({ inputRange: [0, 1], outputRange: [1, 0.5], extrapolate: 'clamp' });
+
+  // ✅ Khi active: icon nhảy xuống ~8px để bù khoảng label biến mất
+  const iconTranslateY = anim.interpolate({ inputRange: [0, 1], outputRange: [0, 3], extrapolate: 'clamp' });
+
+  return (
+    <TouchableOpacity
+      style={{ width: tabWidth, height: tabHeight, alignItems: 'center', justifyContent: 'center',transform: [{ translateY: -insets.bottom/5 }], // ✅ nhích cả item lên 4px
+  }}
+      onPress={onPress}
+      activeOpacity={0.8}
+    >
+      {/* Icon + ribbon dịch xuống khi active */}
+      <Animated.View style={{
+        alignItems: 'center',
+        transform: [{ scale: iconScale }, { translateY: iconTranslateY }],
+      }}>
+        <Animated.View
+          style={{
+            width: 70, height: 29, borderRadius: 10,
+            backgroundColor: '#996600',
+            position: 'absolute', alignSelf: 'center',
+            transform: [{ scaleX: ribbonScaleX }],
+          }}
+        />
+        <Ionicons
+          name={isActive ? iconActive : iconInactive}
+          style={isActive ? styles.IconActive : styles.IconInActive}
+        />
+      </Animated.View>
+
+      {/* Label fade + scale tại chỗ */}
+      <Animated.Text
+        style={{
+          color: 'black', fontSize: 11, fontWeight: 'bold', marginTop: 2,
+          opacity: labelOpacity,
+          transform: [{ scale: labelScale }],
+        }}
+      >
+        {label}
+      </Animated.Text>
+    </TouchableOpacity>
+  );
+}
+// ─────────────────────────────────────────────────────────────
+// CustomTabBar — tách riêng để dùng useEffect theo state.index
+// ─────────────────────────────────────────────────────────────
+function CustomTabBar({ navigation, state, anims, animateTo, tabHeight, tabWidth, HomeScreen }) {
+  const idx = state.index;
+
+  // sync animation khi swipe hoặc nhấn
+  useEffect(() => {
+    animateTo(idx);
+  }, [idx]);
+
+    const insets     = useSafeAreaInsets();
+
+  return (
+    <View
+      style={{
+        flexDirection: 'row',
+        bottom: Platform.OS === 'ios' ? -5: -5,
+        position: 'absolute',
+        width: '100%',
+        justifyContent: 'space-evenly',
+        alignItems: 'center',
+        height: tabHeight,
+        borderTopRightRadius: 15,
+        borderTopLeftRadius: 15,
+        backgroundColor: '#F8BD2D',
+      }}
+    >
+      {TAB_ITEMS.map((item, i) => (
+        <TabItem
+          key={item.name}
+          tabIndex={i}
+          currentIdx={idx}
+          label={item.label}
+          iconActive={item.iconActive}
+          iconInactive={item.iconInactive}
+          tabWidth={tabWidth}
+          tabHeight={tabHeight}
+          anim={anims[i]}
+          onPress={() => {
+            if (idx === i) {
+              if (i === 0 && HomeScreen?.homeRef) HomeScreen.homeRef.scrollToOffset({ offset: 0 });
+              if (i === 1 && global.SearchLawRef) global.SearchLawRef.scrollToOffset({ offset: 0 });
+              if (i === 2 && global.SearchContentRef) global.SearchContentRef.scrollToOffset({ offset: 0 });
+              return;
+            }
+            animateTo(i);
+            navigation.navigate(item.name);
+          }}
+        />
+      ))}
+    </View>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
 // Tab Navigator
-// Tab index: 0=Home  1=SearchStack  2=AIChat
 // ─────────────────────────────────────────────────────────────
 const Tab = createMaterialTopTabNavigator();
 
-const TAB_CONFIGS = [
-  {
-    name: 'Home',
-    label: 'Đã tải xuống',
-    iconActive: 'home',
-    iconInactive: 'home-outline',
-    component: null, // set below
-  },
-  {
-    name: 'SearchStack',
-    label: 'Tìm kiếm',
-    iconActive: 'search',
-    iconInactive: 'search-outline',
-    component: null,
-  },
-  {
-    name: 'AIChat',
-    label: 'Chat AI',
-    iconActive: 'sparkles',
-    iconInactive: 'sparkles-outline',
-    component: null,
-  },
-];
-
 const AppNavigators = () => {
-  const insets = useSafeAreaInsets();
+  const insets     = useSafeAreaInsets();
   const HomeScreen = useContext(RefOfHome);
-
-  const { width } = Dimensions.get('window');
+  const { width }  = Dimensions.get('window');
   const [widthDevice, setWidthDevice] = useState(width);
 
+  // Mỗi tab có Animated.Value riêng: 0 = inactive, 1 = active
+  const anims = useRef(TAB_ITEMS.map((_, i) => new Animated.Value(i === 0 ? 1 : 0))).current;
+
   useEffect(() => {
-    const sub = Dimensions.addEventListener('change', ({ window: { width: w } }) => {
-      setWidthDevice(w);
-    });
+    const sub = Dimensions.addEventListener('change', ({ window: { width: w } }) => setWidthDevice(w));
     return () => sub?.remove();
   }, []);
 
-  const tabTop    = Platform.OS === 'ios' ? -5 : (-insets.bottom / 24) * 10 - 2;
-  const tabHeight = Platform.OS === 'ios' ? 67 : 48 + insets.bottom;
+  const tabHeight = Platform.OS === 'ios' ? insets.bottom+30 : 48 + insets.bottom;
   const tabWidth  = widthDevice / 3 - 30;
 
-  // ── TabItem dùng position trực tiếp ──────────────────────────
-  // Native Animated chỉ hỗ trợ: opacity, transform (scale/translate/rotate)
-  // KHÔNG hỗ trợ: width, height, backgroundColor → dùng scaleX thay width
-  const TabItem = ({ tabIndex, label, iconActive, iconInactive, onPress, position, currentIdx }) => {
-    const i = tabIndex;
-
-    // scaleX: 0→1 thay vì width: 0→70 (ribbon cố định width=70, scale từ 0)
-    const ribbonScaleX = position.interpolate({
-      inputRange: [i - 1, i, i + 1],
-      outputRange: [0, 1, 0],
-      extrapolate: 'clamp',
-    });
-    const iconScale = position.interpolate({
-      inputRange: [i - 1, i, i + 1],
-      outputRange: [1, 1.2, 1],
-      extrapolate: 'clamp',
-    });
-    const isActive = currentIdx === tabIndex;
-
-    // translateY: đẩy label xuống dưới khi active thay vì scale (scale vẫn chiếm height)
-    const labelTranslateY = position.interpolate({
-      inputRange: [i - 1, i, i + 1],
-      outputRange: [0, 20, 0],
-      extrapolate: 'clamp',
-    });
-    const labelOpacity = position.interpolate({
-      inputRange: [i - 1, i, i + 1],
-      outputRange: [1, 0, 1],
-      extrapolate: 'clamp',
-    });
-
-    // translateY cho toàn bộ content: inactive thì nhích lên, active thì về 0
-    const contentTranslateY = position.interpolate({
-      inputRange: [i - 1, i, i + 1],
-      outputRange: [-insets.bottom/3 , -insets.bottom/3 +5, -insets.bottom/3],
-      extrapolate: 'clamp',
-    });
-
-    return (
-      <View
-        style={{
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: tabHeight,
-          width: tabWidth,
-          overflow: 'hidden',
-        }}
-      >
-        <TouchableOpacity
-          style={{
-            width: tabWidth,
-            height: tabHeight,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-          onPress={onPress}
-        >
-          <Animated.View
-            style={{
-              alignItems: 'center',
-              transform: [{ translateY: contentTranslateY }],
-            }}
-          >
-            {/* icon + ribbon */}
-            <Animated.View style={{ alignItems: 'center', transform: [{ scale: iconScale }] }}>
-              <Animated.View
-                style={{
-                  width: 70,
-                  height: 29,
-                  borderRadius: 10,
-                  backgroundColor: '#996600',
-                  position: 'absolute',
-                  alignSelf: 'center',
-                  transform: [{ scaleX: ribbonScaleX }],
-                }}
-              />
-              <Ionicons
-                name={isActive ? iconActive : iconInactive}
-                style={isActive ? styles.IconActive : styles.IconInActive}
-              />
-            </Animated.View>
-
-            {/* label — fade + slide khi active */}
-            <Animated.Text
-              style={{
-                color: 'black',
-                fontSize: 11,
-                fontWeight: 'bold',
-                marginTop: 2,
-                opacity: labelOpacity,
-                transform: [{ translateY: labelTranslateY }],
-              }}
-            >
-              {label}
-            </Animated.Text>
-          </Animated.View>
-        </TouchableOpacity>
-      </View>
-    );
+  const animateTo = (idx) => {
+    Animated.parallel(
+      anims.map((anim, i) =>
+        Animated.timing(anim, {
+          toValue: i === idx ? 1 : 0,
+          duration: 220,
+          useNativeDriver: true,
+        })
+      )
+    ).start();
   };
 
   return (
     <View style={{ flex: 1 }}>
       <Tab.Navigator
         backBehavior="none"
-        tabBar={({ navigation, state, position }) => {
-          const idx = state.index;
-
-          // scroll-to-top khi bấm lại tab đang active
-          if (state.index === Math.round(position._value)) {
-            if (idx === 0 && HomeScreen.homeRef)
-              HomeScreen.homeRef.scrollToOffset({ offset: 0 });
-            if (idx === 1 && global.SearchLawRef)
-              global.SearchLawRef.scrollToOffset({ offset: 0 });
-            if (idx === 2 && global.SearchContentRef)
-              global.SearchContentRef.scrollToOffset({ offset: 0 });
-          }
-
-          return (
-            <View
-              style={{
-                flexDirection: 'row',
-                bottom: Platform.OS === 'ios' ? 0 : -5,
-                position: 'absolute',
-                width: '100%',
-                justifyContent: 'space-evenly',
-                alignItems: 'stretch',
-                height: tabHeight,
-                borderTopRightRadius: 15,
-                borderTopLeftRadius: 15,
-                backgroundColor: '#F8BD2D',
-                overflow: 'hidden',
-              }}
-            >
-              <TabItem
-                tabIndex={0}
-                label="Đã tải xuống"
-                iconActive="home"
-                iconInactive="home-outline"
-                position={position}
-                currentIdx={idx}
-                onPress={() => navigation.navigate('Home')}
-              />
-
-              <TabItem
-                tabIndex={1}
-                label="Tìm kiếm"
-                iconActive="search"
-                iconInactive="search-outline"
-                position={position}
-                currentIdx={idx}
-                onPress={() => navigation.navigate('SearchStack')}
-              />
-
-              <TabItem
-                tabIndex={2}
-                label="Chat AI"
-                iconActive="sparkles"
-                iconInactive="sparkles-outline"
-                position={position}
-                currentIdx={idx}
-                onPress={() => navigation.navigate('AIChat')}
-              />
-            </View>
-          );
-        }}
+        tabBar={(props) => (
+          <CustomTabBar
+            {...props}
+            anims={anims}
+            animateTo={animateTo}
+            tabHeight={tabHeight}
+            tabWidth={tabWidth}
+            HomeScreen={HomeScreen}
+          />
+        )}
         tabBarPosition="bottom"
         screenOptions={{
-          tabBarPressColor: '#FFCC66',
           animationEnabled: false,
           lazy: false,
           tabBarIndicatorStyle: { display: 'none' },
+          tabBarPressColor: 'transparent',
         }}
       >
         <Tab.Screen
@@ -271,20 +215,12 @@ const AppNavigators = () => {
         <Tab.Screen
           name="SearchStack"
           component={SearchStack}
-          options={{
-            header: () => null,
-            tabBarLabel: () => null,
-            swipeEnabled: true,
-          }}
+          options={{ header: () => null, tabBarLabel: () => null, swipeEnabled: true }}
         />
         <Tab.Screen
           name="AIChat"
           component={AIChatScreen}
-          options={{
-            header: () => null,
-            tabBarLabel: () => null,
-            swipeEnabled: true,
-          }}
+          options={{ header: () => null, tabBarLabel: () => null, swipeEnabled: true }}
         />
       </Tab.Navigator>
     </View>
@@ -297,7 +233,7 @@ const AppNavigators = () => {
 const Stack = createNativeStackNavigator();
 
 const StackNavigator = () => {
-  const netInfo = useNetInfo();
+  const netInfo  = useNetInfo();
   const dispatch = useDispatch();
 
   return (
@@ -318,10 +254,10 @@ const StackNavigator = () => {
           name="accessLaw"
           component={Detail5}
           options={{
-            headerTitleAlign: 'center',
+            header: () => null,
             animation: 'simple_push',
             animationTypeForReplace: 'push',
-            header: () => null,
+            headerTitleAlign: 'center',
           }}
         />
         <Stack.Screen
@@ -338,42 +274,10 @@ const StackNavigator = () => {
 // Styles
 // ─────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
-  IconActive: {
-    fontSize: 24,
-    color: 'white',
-    padding: 0,
-    margin: 0,
-    lineHeight: 28,
-  },
-  IconInActive: {
-    fontSize: 24,
-    color: 'black',
-    padding: 0,
-    lineHeight: 23,
-  },
-  TextActive: {
-    fontSize: 24,
-    color: 'black',
-    padding: 0,
-    margin: 0,
-    lineHeight: 10,
-  },
-  TextInActive: {
-    fontSize: 24,
-    color: 'black',
-    padding: 0,
-    lineHeight: 10,
-  },
-  IconInfo: {
-    fontSize: 30,
-    color: 'white',
-  },
-  iconInfoContainer: {
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 25,
-  },
+  IconActive:   { fontSize: 24, color: 'white', padding: 0, margin: 0, lineHeight: 28 },
+  IconInActive: { fontSize: 24, color: 'black', padding: 0, lineHeight: 23 },
+  IconInfo:     { fontSize: 30, color: 'white' },
+  iconInfoContainer: { height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 25 },
 });
 
 export default StackNavigator;
