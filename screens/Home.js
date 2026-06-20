@@ -252,7 +252,7 @@ export default function Home({}) {
       </TouchableWithoutFeedback>
     );
   }
-console.log('insets.bottom:', insets.bottom, 'tabBarHeight:', tabBarHeight);
+// console.log('insets.bottom:', insets.bottom, 'tabBarHeight:', tabBarHeight);
   return (
     <>
       <View

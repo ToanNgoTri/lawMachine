@@ -19,6 +19,6 @@ export const useTabBarHeight = () => {
     return 20 +insets.bottom; // iOS: 67 + insets.bottom (để tránh bị che khi có home indicator)
   } else {
     // Android: 48 + insets.bottom (khớp với navigator)
-    return 43 + insets.bottom;
+    return 37 + insets.bottom ;
   }
 };
