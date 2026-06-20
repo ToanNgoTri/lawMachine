@@ -21,9 +21,9 @@ const client = new MongoClient(
   'mongodb://thuvienphapluat:ZvQn9683p8NnPXFMdR1VX53HTK3Da1WqyXJpvtgMMASTRdDkyu87lFAL7aR5DiiN@46.225.145.42:6980/?directConnection=true',
 );
 
-const clientAI = new MongoClient(
-  'mongodb+srv://ngotritoan33:bookertandtajiri33@location.bijatuf.mongodb.net',
-);
+// const clientAI = new MongoClient(
+//   'mongodb+srv://ngotritoan33:bookertandtajiri33@location.bijatuf.mongodb.net',
+// );
 
 
 export const searchLawDescription = onRequest(async (req, res) => {
