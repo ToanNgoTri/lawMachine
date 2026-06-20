@@ -713,10 +713,20 @@ export function Detail1({}) {
               paper < Math.ceil(Object.keys(LawFilted).length / 30) ? (
                 <>
                   <ActivityIndicator color="black" />
-                  <View style={{ height: tabBarHeight }}></View>
+                  <View
+                    style={{
+                      height: tabBarHeight+5,
+                      width: 10,
+                    }}
+                  ></View>
                 </>
               ) : (
-                <View style={{ height: tabBarHeight }}></View>
+                <View
+                  style={{
+                    height: tabBarHeight+5,
+                    width: 10,
+                  }}
+                ></View>
               )
             }
           />
