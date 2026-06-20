@@ -59,7 +59,7 @@ function TabItem({ tabIndex, currentIdx, label, iconActive, iconInactive, onPres
 
   return (
     <TouchableOpacity
-      style={{ width: tabWidth, height: tabHeight, alignItems: 'center', justifyContent: 'center',transform: [{ translateY: -insets.bottom/3 }], // ✅ nhích cả item lên 4px
+      style={{ width: tabWidth, height: tabHeight, alignItems: 'center', justifyContent: 'center',transform: [{ translateY: -insets.bottom/4 }], // ✅ nhích cả item lên 4px
   }}
       onPress={onPress}
       activeOpacity={0.8}
