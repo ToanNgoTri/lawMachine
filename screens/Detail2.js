@@ -939,7 +939,7 @@ export function Detail2({}) {
                   <ActivityIndicator color="black" />
                   <View
                     style={{
-                      height: tabBarHeight,
+                      height: tabBarHeight+5,
                       width: 10,
                     }}
                   ></View>
@@ -947,7 +947,7 @@ export function Detail2({}) {
               ) : (
                 <View
                   style={{
-                    height: tabBarHeight,
+                    height: tabBarHeight+5,
                     width: 10,
                   }}
                 ></View>

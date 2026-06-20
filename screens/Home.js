@@ -252,7 +252,7 @@ export default function Home({}) {
       </TouchableWithoutFeedback>
     );
   }
-
+console.log('insets.bottom:', insets.bottom, 'tabBarHeight:', tabBarHeight);
   return (
     <>
       <View
@@ -363,7 +363,7 @@ export default function Home({}) {
             ListFooterComponent={() => (
               <View
                 style={{
-                  height: tabBarHeight-6,
+                  height: tabBarHeight,
                   width: '100%',
                 }}
               ></View>

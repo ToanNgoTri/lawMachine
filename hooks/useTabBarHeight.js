@@ -16,7 +16,7 @@ export const useTabBarHeight = () => {
 
   if (Platform.OS === 'ios') {
     // Tab bar height 67 (đúng với code navigator của bạn)
-    return 67;
+    return 20 +insets.bottom; // iOS: 67 + insets.bottom (để tránh bị che khi có home indicator)
   } else {
     // Android: 48 + insets.bottom (khớp với navigator)
     return 43 + insets.bottom;

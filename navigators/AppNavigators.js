@@ -55,7 +55,7 @@ function TabItem({ tabIndex, currentIdx, label, iconActive, iconInactive, onPres
   const labelScale   = anim.interpolate({ inputRange: [0, 1], outputRange: [1, 0.5], extrapolate: 'clamp' });
 
   // ✅ Khi active: icon nhảy xuống ~8px để bù khoảng label biến mất
-  const iconTranslateY = anim.interpolate({ inputRange: [0, 1], outputRange: [0, 3], extrapolate: 'clamp' });
+  const iconTranslateY = anim.interpolate({ inputRange: [0, 1], outputRange: [0, 4], extrapolate: 'clamp' });
 
   return (
     <TouchableOpacity
