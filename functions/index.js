@@ -10,7 +10,7 @@ import { MongoClient } from 'mongodb';
 // const {MongoClient} = require('mongodb');
 
 import serviceAccount from'./project2-197c0-firebase-adminsdk-wgo9a-ddd9ec03a8.json' with { type: "json" } ;;
-
+import openrouterAPIKey from './openrouterAPIKey.json' with { type: "json" } ;
 
 // const serviceAccount = require('./project2-197c0-firebase-adminsdk-wgo9a-4a0448ab63.json');
 
@@ -203,7 +203,7 @@ Nhiệm vụ:
         const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
           method: 'POST',
           headers: {
-          Authorization: `Bearer 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`,
+          Authorization: `${openrouterAPIKey.openrouter_api_key}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
