@@ -1,6 +1,7 @@
 import { onRequest } from 'firebase-functions/v2/https';
 // const logger = require('firebase-functions/logger');
 import admin from 'firebase-admin';
+import { getFirestore } from 'firebase-admin/firestore'
 // var admin = require('firebase-admin');
 // const functions = require('firebase-functions');
 // Create and deploy your first functions
@@ -8,7 +9,8 @@ import admin from 'firebase-admin';
 import { MongoClient } from 'mongodb';
 // const {MongoClient} = require('mongodb');
 
-import serviceAccount from'./project2-197c0-firebase-adminsdk-wgo9a-4a0448ab63.json' with { type: "json" } ;;
+import serviceAccount from'./project2-197c0-firebase-adminsdk-wgo9a-ddd9ec03a8.json' with { type: "json" } ;;
+
 
 // const serviceAccount = require('./project2-197c0-firebase-adminsdk-wgo9a-4a0448ab63.json');
 
@@ -117,163 +119,165 @@ export const getlastedlaws = onRequest(async (req, res) => {
   }
 });
 
-export const askLawAI = onRequest(async (req, res) => {
-  // CORS headers
-  res.set('Access-Control-Allow-Origin', '*');
-  res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.set('Access-Control-Allow-Headers', 'Content-Type');
 
-  // OPTIONS phải xử lý TRƯỚC khi set streaming headers
-  if (req.method === 'OPTIONS') {
-    res.status(204).send('');
-    return;
-  }
 
-  if (req.method !== 'POST') {
-    res.status(405).json({ error: 'Method not allowed' });
-    return;
-  }
+export const askLawAI = onRequest(
+  { memory: '256MiB' },
+  async (req, res) => {
+    const db = getFirestore();
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Content-Type');
 
-  const { question, history = [] } = req.body;
-  if (!question) {
-    res.status(400).json({ error: 'Missing question' });
-    return;
-  }
+    if (req.method === 'OPTIONS') { res.status(204).send(''); return; }
+    if (req.method !== 'POST') { res.status(405).json({ error: 'Method not allowed' }); return; }
 
-  // Chỉ set streaming headers SAU khi đã qua các early return
-  res.setHeader('Content-Type', 'text/event-stream');
-  res.setHeader('Cache-Control', 'no-cache');
-  res.setHeader('Connection', 'keep-alive');
-  res.flushHeaders();
+    const { question, history = [] } = req.body;
+    if (!question) { res.status(400).json({ error: 'Missing question' }); return; }
 
-  try {
-    // ── BƯỚC 1: Embed câu hỏi ──────────────────────────────────────────
-    const embedRes = await fetch('https://ollama.pixelplaces.net/api/embed', {
-      method: 'POST',
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ model: "bge-m3", input: question }),
-    });
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders();
 
-    const embedData = await embedRes.json();
-    const questionVector = embedData.embedding[0];
+    const MODELS = [
+      'google/gemma-4-31b-it:free',
+      'google/gemma-4-26b-a4b-it:free',
+      'qwen/qwen3-next-80b-a3b-instruct:free',
+      'qwen/qwen3-coder:free',
+      'meta-llama/llama-3.3-70b-instruct:free',
+      'meta-llama/llama-3.2-3b-instruct:free',
+    ];
 
-    // ── BƯỚC 2: Tìm chunks từ MongoDB ──────────────────────────────────
-    const database = client.db('LawMachine');
-    const LawContent = database.collection('LawChunks');
+    try {
+      // ── BƯỚC 1: Embed câu hỏi ────────────────────────────────────────
+      const embedRes = await fetch('https://ollama.pixelplaces.net/api/embed', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: 'bge-m3', input: question }),
+      });
+      const embedData = await embedRes.json();
+      const questionVector = embedData.embeddings[0];
 
-    const chunks = await LawContent.find(
-      { embedding: { $exists: true } },
-      { projection: { fullText: 1, embedding: 1, _id: 0 } },
-    )
-      .limit(2000)
-      .toArray();
+      // ── BƯỚC 2: Vector search ─────────────────────────────────────────
+      const snapshot = await db.collection('chunks').findNearest({
+        vectorField: 'embedding',
+        queryVector: questionVector,
+        limit: 5,
+        distanceMeasure: 'COSINE',
+      }).get();
 
-    const cosineSimilarity = (a, b) => {
-      let dot = 0, normA = 0, normB = 0;
-      for (let i = 0; i < a.length; i++) {
-        dot += a[i] * b[i];
-        normA += a[i] * a[i];
-        normB += b[i] * b[i];
+      if (snapshot.empty) {
+        res.write(`data: ${JSON.stringify({ text: 'Không tìm thấy dữ liệu.' })}\n\n`);
+        res.write('data: [DONE]\n\n');
+        res.end();
+        return;
       }
-      return dot / (Math.sqrt(normA) * Math.sqrt(normB));
-    };
 
-    const scored = chunks
-      .map(chunk => ({
-        fullText: chunk.fullText,
-        score: cosineSimilarity(questionVector, chunk.embedding),
-      }))
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 5);
+      const context = snapshot.docs
+        .map((doc, i) => `[Tài liệu ${i + 1}]\n${doc.data().fullText}`)
+        .join('\n\n');
 
-    const results = scored.filter(r => r.score > 0.3);
-
-    if (results.length === 0) {
-      // Stream về lỗi theo SSE format rồi đóng
-      res.write(`data: ${JSON.stringify({ text: 'Không tìm thấy thông tin phù hợp.' })}\n\n`);
-      res.write('data: [DONE]\n\n');
-      res.end();
-      return;
-    }
-
-    // ── BƯỚC 3: Gọi LLM và stream về client ───────────────────────────
-    const systemMsg = {
-      role: 'system',
-      content: `Bạn là AI tư vấn pháp luật Việt Nam.
+      // ── BƯỚC 3: Gọi LLM với fallback ─────────────────────────────────
+      const systemMsg = {
+        role: 'system',
+        content: `Bạn là AI tư vấn pháp luật Việt Nam.
 Nhiệm vụ:
 - Chỉ dùng thông tin trong CONTEXT
 - Trả lời NGẮN GỌN, dễ hiểu.
 - KHÔNG copy nguyên văn dữ liệu.
 - Hãy diễn giải lại bằng ngôn ngữ tự nhiên.
 - Nếu không đủ thông tin thì nói: "Không tìm thấy thông tin phù hợp."`,
-    };
+      };
 
-    const userMsg = {
-      role: 'user',
-      content: `Dữ liệu tham khảo:
-${results.map((x, i) => `[Tài liệu ${i + 1}]\n${x.fullText}`).join('\n\n')}
+      const userMsg = {
+        role: 'user',
+        content: `Dữ liệu tham khảo:\n${context}\n\nCâu hỏi:\n${question}\nHãy trả lời ngắn gọn và diễn giải lại.`,
+      };
 
-Câu hỏi:
-${question}
-Hãy trả lời ngắn gọn và diễn giải lại.`,
-    };
+      let llmRes = null;
+      let usedModel = null;
 
-    const llmRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer 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`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'google/gemma-4-31b-it:free',
-        messages: [...history, systemMsg, userMsg],
-        temperature: 0.2,
-        max_tokens: 500,
-        stream: true,
-      }),
-    });
+      for (const model of MODELS) {
+        console.log(`Thử model: ${model}`);
+        const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+          Authorization: `Bearer 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`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model,
+            messages: [...history, systemMsg, userMsg],
+            temperature: 0.2,
+            max_tokens: 500,
+            stream: true,
+          }),
+        });
 
-    const reader = llmRes.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = '';
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
-      buffer = lines.pop();
-
-      for (const line of lines) {
-        if (!line.startsWith('data: ')) continue;
-        const data = line.slice(6);
-        if (data === '[DONE]') {
-          res.write('data: [DONE]\n\n');
-          res.end(); // ← end() chỉ gọi MỘT lần ở đây
-          return;
+if (r.status === 429 || r.status === 400) {  // ← thêm 400
+  const errText = await r.text().catch(() => '');
+  console.warn(`Model ${model} lỗi ${r.status}, thử tiếp:`, errText);
+  continue;
+}
+        if (!r.ok || !r.body) {
+          const errText = await r.text().catch(() => '');
+          throw new Error(`Model ${model} lỗi ${r.status}: ${errText}`);
         }
-        try {
-          const json = JSON.parse(data);
-          const text = json.choices?.[0]?.delta?.content;
-          if (text) {
-            res.write(`data: ${JSON.stringify({ text })}\n\n`);
-          }
-        } catch (e) {}
+
+        llmRes = r;
+        usedModel = model;
+        break;
       }
-    }
 
-    // Trường hợp stream kết thúc mà không có [DONE]
-    res.write('data: [DONE]\n\n');
-    res.end();
+      if (!llmRes) {
+        res.write(`data: ${JSON.stringify({ error: 'Tất cả model đều bị rate limit. Vui lòng thử lại sau.' })}\n\n`);
+        res.write('data: [DONE]\n\n');
+        res.end();
+        return;
+      }
 
-  } catch (err) {
-    console.error('askLawAI error:', err);
-    // Nếu stream chưa đóng thì gửi lỗi về
-    if (!res.writableEnded) {
-      res.write(`data: ${JSON.stringify({ error: err.message })}\n\n`);
+      console.log(`Dùng model: ${usedModel}`);
+
+      // ── BƯỚC 4: Stream response về client ────────────────────────────
+      const reader = llmRes.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop();
+
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          const data = line.slice(6);
+          if (data === '[DONE]') {
+            res.write('data: [DONE]\n\n');
+            res.end();
+            return;
+          }
+          try {
+            const json = JSON.parse(data);
+            const text = json.choices?.[0]?.delta?.content;
+            if (text) res.write(`data: ${JSON.stringify({ text })}\n\n`);
+          } catch (_) {}
+        }
+      }
+
       res.write('data: [DONE]\n\n');
       res.end();
+
+    } catch (err) {
+      console.error('askLawAI error:', err);
+      if (!res.writableEnded) {
+        res.write(`data: ${JSON.stringify({ error: err.message })}\n\n`);
+        res.write('data: [DONE]\n\n');
+        res.end();
+      }
     }
   }
-});
+);

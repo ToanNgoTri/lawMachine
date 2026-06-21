@@ -12,6 +12,7 @@ import {
   Platform,
   StatusBar,
   Dimensions,
+  Vibration
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -19,10 +20,8 @@ import { useTabBarHeight } from '../hooks/useTabBarHeight';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-const API_URL =
-  'https://us-central1-project2-197c0.cloudfunctions.net/askLawAI';
+const API_URL = 'https://us-central1-project2-197c0.cloudfunctions.net/askLawAI';
 
-/* ─────────────────────────── INITIAL DATA ─────────────────────────── */
 const INITIAL_MESSAGES = [
   {
     id: '0',
@@ -32,14 +31,12 @@ const INITIAL_MESSAGES = [
   },
 ];
 
-/* ─────────────────────────── UTILS ─────────────────────────── */
 const formatTime = date => {
   const h = date.getHours().toString().padStart(2, '0');
   const m = date.getMinutes().toString().padStart(2, '0');
   return `${h}:${m}`;
 };
 
-/* ─────────────────────────── TYPING INDICATOR ─────────────────────────── */
 const TypingIndicator = memo(() => {
   const dots = [
     useRef(new Animated.Value(0)).current,
@@ -102,7 +99,6 @@ const TypingIndicator = memo(() => {
   );
 });
 
-/* ─────────────────────────── MESSAGE BUBBLE ─────────────────────────── */
 const MessageBubble = memo(({ item }) => {
   const isUser = item.role === 'user';
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -164,7 +160,6 @@ const MessageBubble = memo(({ item }) => {
   );
 });
 
-/* ─────────────────────────── MAIN SCREEN ─────────────────────────── */
 export const AIChatScreen = () => {
   const insets = useSafeAreaInsets();
   const tabBarHeight = useTabBarHeight();
@@ -175,25 +170,64 @@ export const AIChatScreen = () => {
   const [isStreaming, setIsStreaming] = useState(false);
   const flatListRef = useRef(null);
   const inputRef = useRef(null);
-  const xhrRef = useRef(null); // giữ ref XHR để có thể huỷ nếu cần
-  
+  const xhrRef = useRef(null);
+  const charQueueRef = useRef([]);       // hàng đợi ký tự chờ render
+  const charTimerRef = useRef(null);     // setTimeout đang chạy
+  const assistantIdRef = useRef(null);   // id message AI hiện tại
 
-  const scrollToBottom = useCallback(() => {
-    setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 80);
+  const scrollToBottom = useCallback((animated = true) => {
+    setTimeout(() => flatListRef.current?.scrollToEnd({ animated }), 80);
   }, []);
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, isTyping]);
+  const charCountRef = useRef(0);
 
-  /* ── Streaming qua XMLHttpRequest (tương thích mọi RN version) ───── */
+  // Xử lý từng ký tự từ queue với setTimeout — rung theo từng char
+const scheduleNextChar = useCallback(() => {
+  if (charQueueRef.current.length === 0) {
+    charTimerRef.current = null;
+    return;
+  }
+
+  const char = charQueueRef.current.shift();
+  const id = assistantIdRef.current;
+
+  Vibration.vibrate(6);
+
+  setMessages(prev =>
+    prev.map(msg =>
+      msg.id === id ? { ...msg, text: msg.text + char } : msg,
+    ),
+  );
+
+  // Auto-scroll mỗi 5 ký tự để không gọi quá nhiều
+  charCountRef.current = (charCountRef.current || 0) + 1;
+  if (charCountRef.current % 5 === 0) {
+    flatListRef.current?.scrollToEnd({ animated: false });
+  }
+
+  charTimerRef.current = setTimeout(scheduleNextChar, 8);
+}, []);
+
+
+  const enqueueChunk = useCallback((chunk) => {
+    charQueueRef.current.push(...chunk.split(''));
+    // Chỉ khởi động timer nếu chưa chạy
+    if (!charTimerRef.current) {
+      charTimerRef.current = setTimeout(scheduleNextChar, 0);
+    }
+  }, [scheduleNextChar]);
+
   const streamAIResponse = useCallback((userText, history) => {
     setIsTyping(true);
     setIsStreaming(true);
+    charQueueRef.current = [];
+    charTimerRef.current = null;
+    charCountRef.current = 0; // ← thêm
 
     const assistantId = `ai-${Date.now()}`;
+    assistantIdRef.current = assistantId;
     let firstChunk = true;
-    let processedLength = 0; // theo dõi đã xử lý đến đâu trong responseText
+    let processedLength = 0;
 
     const xhr = new XMLHttpRequest();
     xhrRef.current = xhr;
@@ -202,18 +236,14 @@ export const AIChatScreen = () => {
     xhr.setRequestHeader('Content-Type', 'application/json');
 
     xhr.onreadystatechange = () => {
-      // readyState 3 = đang nhận data (streaming)
-      // readyState 4 = hoàn tất
-
-      console.log('[XHR] readyState:', xhr.readyState, '| status:', xhr.status);
-      console.log('[XHR] responseText length:', xhr.responseText?.length);
-      console.log(
-        '[XHR] responseText mới:',
-        xhr.responseText?.slice(processedLength),
-      );
       if (xhr.readyState < 3) return;
 
       if (xhr.status !== 200 && xhr.readyState === 4) {
+        if (charTimerRef.current) {
+          clearTimeout(charTimerRef.current);
+          charTimerRef.current = null;
+        }
+        charQueueRef.current = [];
         setIsTyping(false);
         setIsStreaming(false);
         setMessages(prev => [
@@ -228,11 +258,9 @@ export const AIChatScreen = () => {
         return;
       }
 
-      // Chỉ xử lý phần MỚI chưa đọc
       const newText = xhr.responseText.slice(processedLength);
       processedLength = xhr.responseText.length;
 
-      // Tách từng dòng SSE
       const lines = newText.split('\n');
 
       for (const line of lines) {
@@ -240,49 +268,72 @@ export const AIChatScreen = () => {
         const data = line.slice(6).trim();
         if (!data || data === '[DONE]') continue;
 
-        try {
-          const json = JSON.parse(data);
-          if (json.error) {
-            throw new Error(json.error);
-          }
+try {
+  const json = JSON.parse(data);
 
-          const chunk = json.text;
-          if (!chunk) continue;
+  // Lỗi từ server (rate limit, timeout...) → hiển thị ra bubble
+  if (json.error) {
+    setIsTyping(false);
+    setIsStreaming(false);
+    if (charTimerRef.current) {
+      clearTimeout(charTimerRef.current);
+      charTimerRef.current = null;
+    }
+    charQueueRef.current = [];
+    setMessages(prev => [
+      ...prev,
+      {
+        id: `err-${Date.now()}`,
+        role: 'assistant',
+        text: json.error.includes('rate limit') || json.error.includes('Rate limit')
+          ? 'Hệ thống đang bận, vui lòng thử lại sau ít phút.'
+          : `Có lỗi xảy ra: ${json.error}`,
+        timestamp: new Date(),
+      },
+    ]);
+    return;
+  }
 
-          if (firstChunk) {
-            // Chunk đầu tiên: tắt typing, tạo message mới
-            setIsTyping(false);
-            firstChunk = false;
-            setMessages(prev => [
-              ...prev,
-              {
-                id: assistantId,
-                role: 'assistant',
-                text: chunk,
-                timestamp: new Date(),
-              },
-            ]);
-          } else {
-            // Nối chunk vào message đang hiển thị
-            setMessages(prev =>
-              prev.map(msg =>
-                msg.id === assistantId
-                  ? { ...msg, text: msg.text + chunk }
-                  : msg,
-              ),
-            );
-          }
-        } catch (_) {}
+  const chunk = json.text;
+  if (!chunk) continue;
+
+  if (firstChunk) {
+    setIsTyping(false);
+    firstChunk = false;
+    setMessages(prev => [
+      ...prev,
+      {
+        id: assistantId,
+        role: 'assistant',
+        text: '',
+        timestamp: new Date(),
+      },
+    ]);
+    scrollToBottom();
+    enqueueChunk(chunk);
+  } else {
+    enqueueChunk(chunk);
+  }
+} catch (_) {}
       }
 
-      // readyState 4 = stream kết thúc
       if (xhr.readyState === 4) {
-        setIsTyping(false);
-        setIsStreaming(false);
+        // Đợi queue xử lý hết rồi mới tắt streaming
+        const waitQueue = () => {
+          if (charQueueRef.current.length > 0 || charTimerRef.current) {
+            setTimeout(waitQueue, 50);
+          } else {
+            setIsTyping(false);
+            setIsStreaming(false);
+          }
+        };
+        waitQueue();
       }
     };
 
     xhr.onerror = () => {
+      if (charTimerRef.current) clearTimeout(charTimerRef.current);
+      charQueueRef.current = [];
       setIsTyping(false);
       setIsStreaming(false);
       setMessages(prev => [
@@ -297,6 +348,8 @@ export const AIChatScreen = () => {
     };
 
     xhr.ontimeout = () => {
+      if (charTimerRef.current) clearTimeout(charTimerRef.current);
+      charQueueRef.current = [];
       setIsTyping(false);
       setIsStreaming(false);
       setMessages(prev => [
@@ -310,11 +363,10 @@ export const AIChatScreen = () => {
       ]);
     };
 
-    xhr.timeout = 60000; // 60 giây timeout
+    xhr.timeout = 60000;
     xhr.send(JSON.stringify({ question: userText, history }));
-  }, []);
+  }, [enqueueChunk, scrollToBottom]);
 
-  /* ── Gửi tin nhắn ────────────────────────────────────────────────── */
   const handleSend = useCallback(() => {
     const text = inputText.trim();
     if (!text || isStreaming) return;
@@ -334,10 +386,10 @@ export const AIChatScreen = () => {
     };
 
     setMessages(prev => [...prev, userMsg]);
+    scrollToBottom();
     streamAIResponse(text, history);
-  }, [inputText, isStreaming, messages, streamAIResponse]);
+  }, [inputText, isStreaming, messages, streamAIResponse, scrollToBottom]);
 
-  /* ── Render ──────────────────────────────────────────────────────── */
   const renderMessage = useCallback(
     ({ item }) => <MessageBubble item={item} />,
     [],
@@ -369,8 +421,6 @@ export const AIChatScreen = () => {
       ]}
     >
       <StatusBar barStyle="light-content" backgroundColor="#0D0D14" />
-
-      {/* Header */}
 
       <View style={styles.inputBar}>
         <View style={styles.inputRow}>
@@ -408,10 +458,8 @@ export const AIChatScreen = () => {
         </View>
       </View>
 
-
       <View style={styles.headerDivider} />
 
-      {/* Danh sách tin nhắn */}
       <FlatList
         ref={flatListRef}
         data={messages}
@@ -422,14 +470,12 @@ export const AIChatScreen = () => {
         showsVerticalScrollIndicator={false}
         onScrollBeginDrag={Keyboard.dismiss}
         keyboardShouldPersistTaps="handled"
+        maintainVisibleContentPosition={{ minIndexForVisible: 0 }}
       />
-
-      {/* Input bar */}
     </View>
   );
 };
 
-/* ─────────────────────────── STYLES ─────────────────────────── */
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: '#0D0D14' },
 
@@ -535,10 +581,6 @@ const styles = StyleSheet.create({
 
   inputBar: {
     backgroundColor: '#0D0D14',
-    // borderTopWidth: 1,
-    // borderTopColor: '#1E1E30',
-    // borderBottomWidth: 6,
-    // borderBottomColor: 'none',
     paddingHorizontal: 12,
     paddingTop: 10,
     paddingBottom: 8,
