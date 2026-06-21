@@ -450,7 +450,7 @@ try {
             disabled={!inputText.trim() || isStreaming}
           >
             <Ionicons
-              name="arrow-up"
+              name="arrow-down"
               size={18}
               color={inputText.trim() && !isStreaming ? '#fff' : '#3A3A58'}
             />
