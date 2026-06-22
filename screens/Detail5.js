@@ -858,52 +858,48 @@ function setPositionYArtical({ y, key3 }) {
     );
   };
 
-  const d = (key, i, ObjKeys) => {
-    // cho hướng dẫn Công văn của VKS, TANDTC
-    console.log('d');
-    const title = Object.keys(key)[0];
-    const content = Object.values(key)[0];
-    const fullText = `${title}\n${content}`; // hoặc `${title}: ${content}`
-    console.log('tile', title);
+  // const d = (key, i, ObjKeys) => {
+  //   // cho hướng dẫn Công văn của VKS, TANDTC
+  //   console.log('d');
+  //   const title = Object.keys(key)[0];
+  //   const content = Object.values(key)[0];
+  //   const fullText = `${title}\n${content}`; // hoặc `${title}: ${content}`
+  //   console.log('tile', title);
 
-    return Object.keys(key)[0] != '0' ? (
-      <Pressable
-        key={`${i}c`}
-        onLongPress={() => {
-          Clipboard.setString(fullText);
-          console.log('Copied:', fullText);
-          setCopied(title);
-          showToast();
-          Vibration.vibrate(20);
-        }}
-      >
-        <Animated.View
-          style={{
-            paddingVertical: 4,
-            backgroundColor: copied == title ? '#d1daa8ff' : 'transparent',
-          }}
-          onLayout={event => {
-            event.target.measure((x, y, width, height, pageX, pageY) => {
-              setPositionYArtical({
-                y: y + pageY,
-                key3: ObjKeys,
-              });
-            });
-          }}
-        >
-          <Text style={styles.lines}>
-            {/* {typeof  highlight([key[ObjKeys]], valueInput, false) == 'string' ? highlight([key[ObjKeys]], valueInput, false).replace(
-              /\n/gim,
-              '\n    ',
-            ): ' '} */}
-{highlight([fullText], valueInput, false)}
-          </Text>
-        </Animated.View>
-      </Pressable>
-    ) : (
-      <View key={`${i}c1`}></View>
-    );
-  };
+  //   return Object.keys(key)[0] != '0' ? (
+  //     <Pressable
+  //       key={`${i}c`}
+  //       onLongPress={() => {
+  //         Clipboard.setString(fullText);
+  //         console.log('Copied:', fullText);
+  //         setCopied(title);
+  //         showToast();
+  //         Vibration.vibrate(20);
+  //       }}
+  //     >
+  //       <Animated.View
+  //         style={{
+  //           paddingVertical: 4,
+  //           backgroundColor: copied == title ? '#d1daa8ff' : 'transparent',
+  //         }}
+  //         onLayout={event => {
+  //           event.target.measure((x, y, width, height, pageX, pageY) => {
+  //             setPositionYArtical({
+  //               y: y + pageY,
+  //               key3: ObjKeys,
+  //             });
+  //           });
+  //         }}
+  //       >
+  //         <Text style={styles.lines}>
+  //         {highlight([fullText], valueInput, false)}
+  //         </Text>
+  //       </Animated.View>
+  //     </Pressable>
+  //   ) : (
+  //     <View key={`${i}c1`}></View>
+  //   );
+  // };
 
   return (
     <View style={{ flex: 1, position: 'relative' }}>
@@ -1080,10 +1076,6 @@ function setPositionYArtical({ y, key3 }) {
                                 /(^chương .*|^(V|I|X)*\.)/gim,
                               )
                             ? a(key, i, Object.keys(key)[0])
-                            : !Object.keys(key)[0].match(
-                                /^(Câu |Điều )?\d+(\.\d+)*(\.|:|$)(.*)$/gim,
-                              )
-                            ? d(key, i, Object.keys(key)[0])
                             : c(key, i, Object.keys(key)[0])}
                         </View>
                       );
