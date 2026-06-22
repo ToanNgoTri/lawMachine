@@ -1,13 +1,7 @@
 import { onRequest } from 'firebase-functions/v2/https';
-// const logger = require('firebase-functions/logger');
 import admin from 'firebase-admin';
 import { getFirestore } from 'firebase-admin/firestore'
-// var admin = require('firebase-admin');
-// const functions = require('firebase-functions');
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
 import { MongoClient } from 'mongodb';
-// const {MongoClient} = require('mongodb');
 
 import serviceAccount from'./project2-197c0-firebase-adminsdk-wgo9a-ddd9ec03a8.json' with { type: "json" } ;;
 import openrouterAPIKey from './openrouterAPIKey.json' with { type: "json" } ;
@@ -22,10 +16,6 @@ admin.initializeApp({
 const client = new MongoClient(
   'mongodb://thuvienphapluat:ZvQn9683p8NnPXFMdR1VX53HTK3Da1WqyXJpvtgMMASTRdDkyu87lFAL7aR5DiiN@46.225.145.42:6980/?directConnection=true',
 );
-
-// const clientAI = new MongoClient(
-//   'mongodb+srv://ngotritoan33:bookertandtajiri33@location.bijatuf.mongodb.net',
-// );
 
 
 export const searchLawDescription = onRequest(async (req, res) => {
