@@ -34,7 +34,7 @@ export function ScreenToggle({ active }) {
         <Text
           style={[styles.label, active === 'searchlaw' && styles.labelActive]}
         >
-          Tên văn bản
+          Tìm trích yếu
         </Text>
       </TouchableOpacity>
 
@@ -43,7 +43,7 @@ export function ScreenToggle({ active }) {
         onPress={() => goTo('Search', 'search')}
       >
         <Text style={[styles.label, active === 'search' && styles.labelActive]}>
-          Nội dung
+          Tìm nội dung
         </Text>
       </TouchableOpacity>
     </View>

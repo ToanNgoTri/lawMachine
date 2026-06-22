@@ -716,6 +716,9 @@ function setPositionYArtical({ y, key3 }) {
     onlyArticle = false;
     console.log('b');
 
+    console.log('keyA', keyA);
+    console.log('keyB',keyB);
+    
     return (
       <View
       // key={`${i}b`}
