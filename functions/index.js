@@ -164,20 +164,40 @@ export const askLawAI = onRequest(
         return;
       }
 
-      const context = snapshot.docs
-        .map((doc, i) => `[Tài liệu ${i + 1}]\n${doc.data().fullText}`)
-        .join('\n\n');
+    const context = snapshot.docs
+      .map(
+        (doc, i) =>
+          `[${doc.data().fullText}\nVăn bản ký ngày ${new Date(doc.data().lawdateSign).toLocaleDateString("vi-VN")} có hiệu lực ngày ${new Date(doc.data().lawDayActive).toLocaleDateString("vi-VN")}]`,
+      )
+      .join("\n\n");
 
       // ── BƯỚC 3: Gọi LLM với fallback ─────────────────────────────────
       const systemMsg = {
         role: 'system',
         content: `Bạn là AI tư vấn pháp luật Việt Nam.
 Nhiệm vụ:
-- Chỉ dùng thông tin trong CONTEXT
+- Chỉ dùng thông tin trong CONTEXT bên dưới.
 - Trả lời NGẮN GỌN, dễ hiểu.
-- KHÔNG copy nguyên văn dữ liệu.
 - Hãy diễn giải lại bằng ngôn ngữ tự nhiên.
-- Nếu không đủ thông tin thì nói: "Không tìm thấy thông tin phù hợp."`,
+
+Khi câu trả lời có căn cứ pháp luật:
+1. Luôn nêu căn cứ trước.
+2. Ghi theo mẫu:
+   "Căn cứ [Tên văn bản] số [Số văn bản] ngày ...., có hiệu lực từ ngày ... .
+   Điều [1|2|3]. [ghi rõ nội dung trích yếu]:
+   [[1|2|3]. nội dung cụ thể ]...
+2. Sau đó mới giải thích nội dung bằng lời văn tự nhiên.
+4. Không được bịa số điều, khoản hoặc tên văn bản. Chỉ sử dụng thông tin có trong CONTEXT.
+
+Định dạng đầu ra:
+- Chỉ được xuất plain text.
+- Cấm sử dụng các ký tự Markdown như *, **, #, -, _, >, 
+
+Nếu không đủ thông tin thì trả lời:
+"Không tìm thấy thông tin phù hợp."
+
+CONTEXT:
+${context}`,
       };
 
       const userMsg = {
